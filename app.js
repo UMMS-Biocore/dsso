@@ -8,19 +8,24 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
-// const bodyParser = require('body-parser');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const tourRouter = require('./routes/tourRoutes');
-const metaRouter = require('./routes/metaRoutes');
+const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
-const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const accessTokens = require('./controllers/accessTokenController');
+
+// const client = require("./client");
+// const config = require("./config");
+// const db = require("./db");
+// const oauth2 = require('./oauth2');
+// const site = require('./site');
+// const token = require('./token');
+// const user = require('./user');
 
 // Start express app
 const app = express();
@@ -66,8 +71,6 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 // Passport configuration
@@ -78,6 +81,22 @@ app.use(
     saveUninitialized: true,
     resave: true,
     secret: process.env.SESSION_SECRET
+  })
+);
+
+console.log('Using MemoryStore for the data store');
+console.log('Using MemoryStore for the Session');
+const MemoryStore = expressSession.MemoryStore;
+
+// Session Configuration
+app.use(
+  expressSession({
+    saveUninitialized: true,
+    resave: true,
+    secret: process.env.SESSION_SECRET,
+    store: new MemoryStore(),
+    key: 'authorization.sid',
+    cookie: { maxAge: process.env.SESSION_MAXAGE }
   })
 );
 
@@ -121,10 +140,10 @@ setInterval(() => {
 
 // 3) ROUTES
 app.use('/', viewRouter);
-app.use('/api/v1/tours', tourRouter);
-app.use('/api/v1/meta', metaRouter);
+app.use('/api/v1/oauth', oauthRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/clients', clientRouter);
+app.use('/api/v1/tokens', tokenRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

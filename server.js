@@ -4,11 +4,6 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-// TODO: Change these for your own certificates.  This was generated
-// through the commands:
-// openssl genrsa -out privatekey.pem 2048
-// openssl req -new -key privatekey.pem -out certrequest.csr
-// openssl x509 -req -in certrequest.csr -signkey privatekey.pem -out certificate.pem
 const options = {
   key: fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem')),
   cert: fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'))
@@ -23,10 +18,7 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 mongoose
   .connect(DB, {

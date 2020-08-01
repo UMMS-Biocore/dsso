@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const passport = require('passport');
 // const request = require('request');
 const { get, post } = require('request');
 const { promisify } = require('util');
@@ -65,38 +66,59 @@ exports.signup = catchAsync(async (req, res, next) => {
   createSendToken(newUser, 201, req, res);
 });
 
-exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-  // 1) Check if email and password exist
-  if (!email || !password) {
-    return next(new AppError('Please provide email and password!', 400));
-  }
-  // 2) Check if user exists && password is correct
-  const user = await User.findOne({ email }).select('+password');
+// exports.login = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
+//   // 1) Check if email and password exist
+//   if (!email || !password) {
+//     return next(new AppError('Please provide email and password!', 400));
+//   }
+//   // 2) Check if user exists && password is correct
+//   const user = await User.findOne({ email }).select('+password');
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError('Incorrect email or password', 401));
-  }
+//   if (!user || !(await user.correctPassword(password, user.password))) {
+//     return next(new AppError('Incorrect email or password', 401));
+//   }
 
-  // 3) If everything ok, send token to client
-  createSendToken(user, 200, req, res);
-});
+//   // 3) If everything ok, send token to client
+//   createSendToken(user, 200, req, res);
+// });
 
-exports.logout = async (req, res) => {
-  req.session.isAuthorized = false;
+// exports.logout = async (req, res) => {
+//   req.session.isAuthorized = false;
 
-  const { statusCode, body } = await getAsync({
-    url: `${process.env.SSO_URL}logout`,
-    rejectUnauthorized: false
-  });
-  console.log('statusCode', statusCode);
-  console.log('body', body);
+//   const { statusCode, body } = await getAsync({
+//     url: `${process.env.SSO_URL}logout`,
+//     rejectUnauthorized: false
+//   });
+//   console.log('statusCode', statusCode);
+//   console.log('body', body);
 
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
-  res.status(200).json({ status: 'success' });
+//   res.cookie('jwt', 'loggedout', {
+//     expires: new Date(Date.now() + 10 * 1000),
+//     httpOnly: true
+//   });
+//   res.status(200).json({ status: 'success' });
+// };
+
+/**
+ * Authenticate normal login page using strategy of authenticate
+ */
+exports.login = [
+  passport.authenticate('local', {
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/login'
+  })
+];
+
+/**
+ * Logout of the system and redirect to root
+ * @param   {Object}   req - The request
+ * @param   {Object}   res - The response
+ * @returns {undefined}
+ */
+exports.logout = (req, res) => {
+  req.logout();
+  res.redirect('/');
 };
 
 exports.protect = catchAsync(async (req, res, next) => {

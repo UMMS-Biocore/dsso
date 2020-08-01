@@ -1,7 +1,7 @@
 {
-  "name": "natours",
+  "name": "dlogin",
   "version": "1.0.0",
-  "description": "Learning node, express and mongoDB",
+  "description": "Authorization server for Dmeta, Dnext and Dportal",
   "main": "app.js",
   "scripts": {
     "start": "node server.js",
@@ -13,8 +13,8 @@
     "webpack": "webpack-dev-server"
   },
   "browserslist": "> 1%, last 2 versions",
-  "author": "Jonas Schmedtmann",
-  "license": "ISC",
+  "author": "Onur Yukselen",
+  "license": "MIT",
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "autoprefixer": "^9.8.0",
