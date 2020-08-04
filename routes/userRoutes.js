@@ -5,17 +5,18 @@ const authController = require('./../controllers/authController');
 const router = express.Router();
 
 router.post('/signup', authController.signup);
-router.post('/login', authController.login);
+// router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+router.get('/info', userController.userinfo); //passport.authenticate('bearer')
+
 // Protect all routes after this middleware
 router.use(authController.protect);
 
 router.patch('/updateMyPassword', authController.updatePassword);
-router.get('/info', userController.userinfo);
 router.get('/me', userController.getMe, userController.getUser);
 router.patch(
   '/updateMe',

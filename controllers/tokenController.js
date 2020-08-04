@@ -1,5 +1,5 @@
-const db = require('./db');
-const validate = require('./validate');
+const db = require('./../utils/db');
+const validate = require('./../utils/validate');
 
 /**
  * This endpoint is for verifying a token.  This has the same signature to

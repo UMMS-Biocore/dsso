@@ -14,18 +14,12 @@ const passport = require('passport');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const authRouter = require('./routes/authRoutes');
+const oauthRouter = require('./routes/oauthRoutes');
 const userRouter = require('./routes/userRoutes');
+const clientRouter = require('./routes/clientRoutes');
+const tokenRouter = require('./routes/tokenRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const accessTokens = require('./controllers/accessTokenController');
-
-// const client = require("./client");
-// const config = require("./config");
-// const db = require("./db");
-// const oauth2 = require('./oauth2');
-// const site = require('./site');
-// const token = require('./token');
-// const user = require('./user');
 
 // Start express app
 const app = express();
@@ -67,22 +61,17 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 
-app.use(passport.initialize());
-app.use(passport.session());
-// Passport configuration
-require('./utils/auth');
-
-app.use(
-  expressSession({
-    saveUninitialized: true,
-    resave: true,
-    secret: process.env.SESSION_SECRET
-  })
-);
+// app.use(
+//   expressSession({
+//     saveUninitialized: true,
+//     resave: true,
+//     secret: process.env.SESSION_SECRET
+//   })
+// );
 
 console.log('Using MemoryStore for the data store');
 console.log('Using MemoryStore for the Session');
@@ -96,9 +85,16 @@ app.use(
     secret: process.env.SESSION_SECRET,
     store: new MemoryStore(),
     key: 'authorization.sid',
-    cookie: { maxAge: process.env.SESSION_MAXAGE }
+    cookie: { maxAge: 3600000 * 24 * 7 * 52 } // a year in ms
   })
 );
+
+// WARNING: place the app.use(require('cookie-parser')); app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false })); BEFORE calling the: app.use(passport.initialize()); app.use(passport.session());
+
+app.use(passport.initialize());
+app.use(passport.session());
+// Passport configuration
+require('./utils/auth');
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -139,6 +135,7 @@ setInterval(() => {
 }, process.env.TIME_TO_CHECK_EXPIRED_TOKENS * 1000);
 
 // 3) ROUTES
+
 app.use('/', viewRouter);
 app.use('/api/v1/oauth', oauthRouter);
 app.use('/api/v1/users', userRouter);

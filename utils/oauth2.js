@@ -5,19 +5,18 @@
 // through a process of the user granting access, and the client exchanging
 // the grant for an access token.
 
-const config = require('./config');
-const db = require('./db');
 const login = require('connect-ensure-login');
 const oauth2orize = require('oauth2orize');
 const passport = require('passport');
-const utils = require('./utils');
+const tokenUtils = require('./tokenUtils');
 const validate = require('./validate');
+const db = require('./db');
 
 // create OAuth 2.0 server
 const server = oauth2orize.createServer();
 
 // Configured expiresIn
-const expiresIn = { expires_in: config.token.expiresIn };
+const expiresIn = { expires_in: process.env.ACCESS_TOKEN_EXPIRES_IN };
 
 /**
  * Grant authorization codes
@@ -35,9 +34,9 @@ server.grant(
     console.log(redirectURI);
     console.log(user);
 
-    const code = utils.createToken({
+    const code = tokenUtils.createToken({
       sub: user.id,
-      exp: config.codeToken.expiresIn
+      exp: process.env.CODE_TOKEN_EXPIRES_IN
     });
     console.log(code);
     console.log(done);
@@ -60,11 +59,11 @@ server.grant(
   oauth2orize.grant.token((client, user, ares, done) => {
     console.log('oauth2orize.grant2');
 
-    const token = utils.createToken({
+    const token = tokenUtils.createToken({
       sub: user.id,
-      exp: config.token.expiresIn
+      exp: process.env.ACCESS_TOKEN_EXPIRES_IN
     });
-    const expiration = config.token.calculateExpirationDate();
+    const expiration = tokenUtils.calculateExpirationDate();
 
     db.accessTokens
       .save(token, expiration, user.id, client.id, client.scope)
@@ -144,11 +143,11 @@ server.exchange(
   oauth2orize.exchange.clientCredentials((client, scope, done) => {
     console.log('oauth2orize.exchange.clientCredentials');
 
-    const token = utils.createToken({
+    const token = tokenUtils.createToken({
       sub: client.id,
-      exp: config.token.expiresIn
+      exp: process.env.ACCESS_TOKEN_EXPIRES_IN
     });
-    const expiration = config.token.calculateExpirationDate();
+    const expiration = tokenUtils.calculateExpirationDate();
     // Pass in a null for user id since there is no user when using this grant type
     db.accessTokens
       .save(token, expiration, null, client.id, scope)
@@ -194,6 +193,7 @@ server.exchange(
  * authorization).  We accomplish that here by routing through `ensureLoggedIn()`
  * first, and rendering the `dialog` view.
  */
+
 exports.authorization = [
   login.ensureLoggedIn(),
   server.authorization((clientID, redirectURI, scope, done) => {

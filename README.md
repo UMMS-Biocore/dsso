@@ -1,4 +1,4 @@
-# Dlogin Server
+# Dlogin Server - Authorization server
 
 ## Initial Setup:
 

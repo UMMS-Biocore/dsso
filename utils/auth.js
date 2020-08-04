@@ -1,10 +1,70 @@
-const BearerStrategy = require('passport-http-bearer').Strategy;
 const passport = require('passport');
-const request = require('request');
-const util = require('util');
-const accessTokens = require('./../controllers/accessTokenController');
+const { Strategy: LocalStrategy } = require('passport-local');
+const { BasicStrategy } = require('passport-http');
+const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
+const { Strategy: BearerStrategy } = require('passport-http-bearer');
+const validate = require('./validate');
+const db = require('./db');
+// const accessTokens = require('./../controllers/accessTokenController');
 
-const requestPromise = util.promisify(request);
+/**
+ * LocalStrategy
+ *
+ * This strategy is used to authenticate users based on a username and password.
+ * Anytime a request is made to authorize an application, we must ensure that
+ * a user is logged in before asking them to approve the request.
+ */
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    console.log('LocalStrategy');
+    db.users
+      .findByUsername(username)
+      .then(user => validate.user(user, password))
+      .then(user => done(null, user))
+      .catch(() => done(null, false));
+  })
+);
+
+/**
+ * BasicStrategy & ClientPasswordStrategy
+ *
+ * These strategies are used to authenticate registered OAuth clients.  They are
+ * employed to protect the `token` endpoint, which consumers use to obtain
+ * access tokens.  The OAuth 2.0 specification suggests that clients use the
+ * HTTP Basic scheme to authenticate.  Use of the client password strategy
+ * allows clients to send the same credentials in the request body (as opposed
+ * to the `Authorization` header).  While this approach is not recommended by
+ * the specification, in practice it is quite common.
+ */
+passport.use(
+  new BasicStrategy((clientId, clientSecret, done) => {
+    console.log('BasicStrategy');
+
+    db.clients
+      .findByClientId(clientId)
+      .then(client => validate.client(client, clientSecret))
+      .then(client => done(null, client))
+      .catch(() => done(null, false));
+  })
+);
+
+/**
+ * Client Password strategy
+ *
+ * The OAuth 2.0 client password authentication strategy authenticates clients
+ * using a client ID and client secret. The strategy requires a verify callback,
+ * which accepts those credentials and calls done providing a client.
+ */
+passport.use(
+  new ClientPasswordStrategy((clientId, clientSecret, done) => {
+    console.log('ClientPasswordStrategy');
+    db.clients
+      .findByClientId(clientId)
+      .then(client => validate.client(client, clientSecret))
+      .then(client => done(null, client))
+      .catch(() => done(null, false));
+  })
+);
 
 /**
  * BearerStrategy
@@ -13,46 +73,19 @@ const requestPromise = util.promisify(request);
  * (aka a bearer token).  If a user, they must have previously authorized a client
  * application, which is issued an access token to make requests on behalf of
  * the authorizing user.
+ *
+ * To keep this example simple, restricted scopes are not implemented, and this is just for
+ * illustrative purposes
  */
 passport.use(
-  new BearerStrategy(async (accessToken, done) => {
-    console.log('****** Passport BearerStrategy ******');
-    //test with: https://localhost:4000/api/v1/meta/protectedEndPoint
-    try {
-      const token = await accessTokens.find(accessToken);
-      if (token != null && new Date() > token.expirationDate) {
-        await accessTokens.delete(accessToken);
-      }
-      if (token == null) {
-        const tokeninfoURL = process.env.SSO_TOKEN_INFO_URL;
-        await requestPromise(tokeninfoURL + accessToken, async (error, response, body) => {
-          try {
-            if (error != null || response.statusCode !== 200) {
-              console.log('2');
-              throw new Error('Token request not valid');
-            }
-            const bodyObj = JSON.parse(body);
-            const expirationDate = bodyObj.expires_in
-              ? new Date(Date.now() + bodyObj.expires_in * 1000)
-              : null;
-            const userId = null;
-            const scope = null;
-            await accessTokens.save(
-              accessToken,
-              expirationDate,
-              userId,
-              process.env.CLIENT_ID,
-              scope
-            );
-          } catch (err) {
-            done(null, false);
-          }
-        });
-      }
-      done(null, accessToken);
-    } catch (err) {
-      done(null, false);
-    }
+  new BearerStrategy((accessToken, done) => {
+    console.log('BearerStrategy');
+
+    db.accessTokens
+      .find(accessToken)
+      .then(token => validate.token(token, accessToken))
+      .then(token => done(null, token, { scope: '*' }))
+      .catch(() => done(null, false));
   })
 );
 
@@ -70,12 +103,14 @@ passport.use(
 // the client by ID from the database.
 
 passport.serializeUser((user, done) => {
-  console.log('user', user);
-  done(null, user);
+  console.log('serializeUser', user);
+  done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
-  console.log('user', user);
-
-  done(null, user);
+passport.deserializeUser((id, done) => {
+  console.log('deserializeUser');
+  db.users
+    .find(id)
+    .then(user => done(null, user))
+    .catch(err => done(err));
 });

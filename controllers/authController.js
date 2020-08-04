@@ -110,6 +110,11 @@ exports.login = [
   })
 ];
 
+// exports.login = (req, res) => {
+//   console.log(req.body);
+//   res.redirect('/login');
+// };
+
 /**
  * Logout of the system and redirect to root
  * @param   {Object}   req - The request

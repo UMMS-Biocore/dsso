@@ -1,5 +1,6 @@
 const multer = require('multer');
 const sharp = require('sharp');
+const passport = require('passport');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
@@ -52,8 +53,6 @@ const filterObj = (obj, ...allowedFields) => {
   });
   return newObj;
 };
-
-const passport = require('passport');
 
 /**
  * Simple informational end point, if you want to get information
