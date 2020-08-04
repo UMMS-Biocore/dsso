@@ -135,7 +135,6 @@ setInterval(() => {
 }, process.env.TIME_TO_CHECK_EXPIRED_TOKENS * 1000);
 
 // 3) ROUTES
-
 app.use('/', viewRouter);
 app.use('/api/v1/oauth', oauthRouter);
 app.use('/api/v1/users', userRouter);

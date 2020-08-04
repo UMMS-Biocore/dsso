@@ -1,5 +1,3 @@
-'use strict';
-
 const jwt = require('jsonwebtoken');
 
 // The access tokens.
@@ -17,7 +15,9 @@ let tokens = Object.create(null);
  * @param   {String}  token - The token to decode to get the id of the access token to find.
  * @returns {Promise} resolved with the token if found, otherwise resolved with undefined
  */
-exports.find = (token) => {
+exports.find = key => Promise.resolve(tokens[key]);
+
+exports.find = token => {
   try {
     const id = jwt.decode(token).jti;
     return Promise.resolve(tokens[id]);
@@ -48,7 +48,7 @@ exports.save = (token, expirationDate, userID, clientID, scope) => {
  * @param   {String}  token - The token to decode to get the id of the access token to delete.
  * @returns {Promise} resolved with the deleted token
  */
-exports.delete = (token) => {
+exports.delete = token => {
   try {
     const id = jwt.decode(token).jti;
     const deletedToken = tokens[id];
@@ -65,7 +65,7 @@ exports.delete = (token) => {
  * @returns {Promise} resolved with an associative of tokens that were expired
  */
 exports.removeExpired = () => {
-  const keys    = Object.keys(tokens);
+  const keys = Object.keys(tokens);
   const expired = keys.reduce((accumulator, key) => {
     if (new Date() > tokens[key].expirationDate) {
       const expiredToken = tokens[key];
@@ -83,6 +83,6 @@ exports.removeExpired = () => {
  */
 exports.removeAll = () => {
   const deletedTokens = tokens;
-  tokens              = Object.create(null);
+  tokens = Object.create(null);
   return Promise.resolve(deletedTokens);
 };

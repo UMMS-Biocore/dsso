@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
+//Note: The actual access token is never saved for security reasons. Instead only id's are saved.
 const AccessTokenSchema = new mongoose.Schema({
-  token: String,
+  id: {
+    type: String,
+    required: true
+  },
   userId: {
     type: String,
     trim: true,

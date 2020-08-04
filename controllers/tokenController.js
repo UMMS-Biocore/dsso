@@ -22,7 +22,8 @@ const validate = require('./../utils/validate');
  * @param   {Object}  res - The response
  * @returns {Promise} Returns the promise for testing only
  */
-exports.info = (req, res) =>
+exports.info = (req, res) => {
+  console.log(req.query);
   validate
     .tokenForHttp(req.query.access_token)
     .then(() => db.accessTokens.find(req.query.access_token))
@@ -34,6 +35,9 @@ exports.info = (req, res) =>
         .then(client => ({ client, token }))
     )
     .then(({ client, token }) => {
+      console.log('token', token);
+      console.log('token.expirationDate:', token.expirationDate.getTime());
+      console.log('Date.now:', Date.now());
       const expirationLeft = Math.floor((token.expirationDate.getTime() - Date.now()) / 1000);
       res.json({ audience: client.clientId, expires_in: expirationLeft });
     })
@@ -41,6 +45,7 @@ exports.info = (req, res) =>
       res.status(err.status);
       res.json({ error: err.message });
     });
+};
 
 /**
  * This endpoint is for revoking a token.  This has the same signature to

@@ -1,7 +1,13 @@
+const jwt = require('jsonwebtoken');
 const AccessToken = require('../models/accessTokenModel');
 
+/**
+ * Returns an access token if it finds one, otherwise returns null if one is not found.
+ * @param   {String}  token - The token to decode to get the id of the access token to find.
+ */
 exports.find = async token => {
-  return await AccessToken.findOne({ token: token }, function(err, item) {
+  const id = jwt.decode(token).jti;
+  return await AccessToken.findOne({ id: id }, function(err, item) {
     console.log('accesstoken find err1:', err);
     console.log('accesstoken find item1:', item);
     if (err) {
@@ -11,10 +17,21 @@ exports.find = async token => {
   });
 };
 
+/**
+ * Saves a access token, expiration date, user id, client id, and scope. Note: The actual full
+ * access token is never saved.  Instead just the ID of the token is saved.  In case of a database
+ * breach this prevents anyone from stealing the live tokens.
+ * @param   {Object}  token          - The access token (required)
+ * @param   {Date}    expirationDate - The expiration of the access token (required)
+ * @param   {String}  userID         - The user ID (required)
+ * @param   {String}  clientID       - The client ID (required)
+ * @param   {String}  scope          - The scope (optional)
+ */
 exports.save = async (token, expirationDate, userId, clientId, scope) => {
   try {
+    const id = jwt.decode(token).jti;
     const newToken = new AccessToken({
-      token: token,
+      id: id,
       expirationDate: expirationDate,
       userId: userId,
       clientId: clientId,
@@ -28,8 +45,13 @@ exports.save = async (token, expirationDate, userId, clientId, scope) => {
   }
 };
 
+/**
+ * Deletes/Revokes an access token by getting the ID and removing it from the storage.
+ * @param   {String}  token - The token to decode to get the id of the access token to delete.
+ */
 exports.delete = async token => {
-  return await AccessToken.findOneAndRemove({ token: token }, function(err, item) {
+  const id = jwt.decode(token).jti;
+  return await AccessToken.findOneAndRemove({ id: id }, function(err, item) {
     console.log('AccessToken removed', item, err);
     if (err) {
       return err;
@@ -38,6 +60,10 @@ exports.delete = async token => {
   });
 };
 
+/**
+ * Removes expired access tokens. It does this by looping through them all and then removing the
+ * expired ones it finds.
+ */
 // Removes expired access tokens.
 exports.removeExpired = async function(done) {
   try {
@@ -53,37 +79,3 @@ exports.removeExpired = async function(done) {
   }
   return done(null);
 };
-
-// exports.forgotPassword = catchAsync(async (req, res, next) => {
-//   // 1) Get user based on POSTed email
-//   const user = await User.findOne({ email: req.body.email });
-//   if (!user) {
-//     return next(new AppError('There is no user with email address.', 404));
-//   }
-
-//   // 2) Generate the random reset token
-//   const resetToken = user.createPasswordResetToken();
-//   await user.save({ validateBeforeSave: false });
-
-//   // 3) Send it to user's email
-//   try {
-//     const resetURL = `${req.protocol}://${req.get(
-//       'host'
-//     )}/api/v1/users/resetPassword/${resetToken}`;
-//     await new Email(user, resetURL).sendPasswordReset();
-
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'Token sent to email!'
-//     });
-//   } catch (err) {
-//     user.passwordResetToken = undefined;
-//     user.passwordResetExpires = undefined;
-//     await user.save({ validateBeforeSave: false });
-
-//     return next(
-//       new AppError('There was an error sending the email. Try again later!'),
-//       500
-//     );
-//   }
-// });
