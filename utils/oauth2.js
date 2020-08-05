@@ -92,6 +92,7 @@ server.exchange(
     console.log('oauth2orize.exchange.code');
     try {
       const authCode = await authCodes.delete(code);
+      console.log('deleted authCode', authCode);
       const validated = validate.authCode(code, authCode, client, redirectURI);
       if (!validated) return done(false);
       const tokens = await validate.generateTokens(authCode);
@@ -214,6 +215,8 @@ exports.authorization = [
     console.log('server.authorization');
     try {
       const client = await clients.findByClientId(clientID);
+      console.log('client', client);
+      console.log('scope', scope);
       if (client) {
         client.scope = scope;
         // WARNING: For security purposes, it is highly advisable to check that

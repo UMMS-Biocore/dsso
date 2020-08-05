@@ -33,8 +33,7 @@ exports.find = async token => {
  */
 exports.save = async (code, clientId, redirectUri, userId, scope) => {
   try {
-    console.log('**** authorization code save1');
-
+    console.log('**** authorization code will be saved');
     const id = jwt.decode(code).jti;
     const newToken = new AuthCode({
       id: id,
