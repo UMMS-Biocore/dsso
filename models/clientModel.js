@@ -13,13 +13,14 @@ const clientSchema = new mongoose.Schema({
   },
   clientSecret: {
     type: String,
-    trim: true
+    trim: true,
+    select: false
   },
   created: {
     type: Date,
     default: Date.now
   },
-  trusted_client: {
+  trustedClient: {
     type: Boolean,
     default: false
   },

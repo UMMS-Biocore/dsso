@@ -4,8 +4,9 @@ const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const { Strategy: BearerStrategy } = require('passport-http-bearer');
 const validate = require('./validate');
-const db = require('./db');
-// const accessTokens = require('./../controllers/accessTokenController');
+const accessTokens = require('./../controllers/accessTokenController');
+const User = require('./../models/userModel');
+const Client = require('./../models/clientModel');
 
 /**
  * LocalStrategy
@@ -15,13 +16,17 @@ const db = require('./db');
  * a user is logged in before asking them to approve the request.
  */
 passport.use(
-  new LocalStrategy((username, password, done) => {
+  new LocalStrategy(async (username, password, done) => {
     console.log('LocalStrategy');
-    db.users
-      .findByUsername(username)
-      .then(user => validate.user(user, password))
-      .then(user => done(null, user))
-      .catch(() => done(null, false));
+    try {
+      const user = await User.findOne({ username }).select('+password');
+      if (!user || !(await user.correctPassword(password, user.password))) {
+        return done(null, false);
+      }
+      done(null, user);
+    } catch {
+      done(null, false);
+    }
   })
 );
 
@@ -37,14 +42,17 @@ passport.use(
  * the specification, in practice it is quite common.
  */
 passport.use(
-  new BasicStrategy((clientId, clientSecret, done) => {
+  new BasicStrategy(async (clientId, clientSecret, done) => {
     console.log('BasicStrategy');
-
-    db.clients
-      .findByClientId(clientId)
-      .then(client => validate.client(client, clientSecret))
-      .then(client => done(null, client))
-      .catch(() => done(null, false));
+    try {
+      const client = await Client.findOne({ clientId }).select('+clientSecret');
+      if (!client || !(await validate.client(client, clientSecret))) {
+        return done(null, false);
+      }
+      done(null, client);
+    } catch {
+      done(null, false);
+    }
   })
 );
 
@@ -56,13 +64,18 @@ passport.use(
  * which accepts those credentials and calls done providing a client.
  */
 passport.use(
-  new ClientPasswordStrategy((clientId, clientSecret, done) => {
+  new ClientPasswordStrategy(async (clientId, clientSecret, done) => {
     console.log('ClientPasswordStrategy');
-    db.clients
-      .findByClientId(clientId)
-      .then(client => validate.client(client, clientSecret))
-      .then(client => done(null, client))
-      .catch(() => done(null, false));
+    try {
+      const client = await Client.findOne({ clientId }).select('+clientSecret');
+      console.log('client', client);
+      if (!client || !(await validate.client(client, clientSecret))) {
+        return done(null, false);
+      }
+      done(null, client);
+    } catch {
+      done(null, false);
+    }
   })
 );
 
@@ -78,14 +91,17 @@ passport.use(
  * illustrative purposes
  */
 passport.use(
-  new BearerStrategy((accessToken, done) => {
+  new BearerStrategy(async (accessToken, done) => {
     console.log('BearerStrategy');
-
-    db.accessTokens
-      .find(accessToken)
-      .then(token => validate.token(token, accessToken))
-      .then(token => done(null, token, { scope: '*' }))
-      .catch(() => done(null, false));
+    try {
+      const token = await accessTokens.find(accessToken);
+      if (!token || !(await validate.token(token, accessToken))) {
+        return done(null, false);
+      }
+      done(null, token, { scope: '*' });
+    } catch {
+      done(null, false);
+    }
   })
 );
 
@@ -104,13 +120,18 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   console.log('serializeUser', user);
-  done(null, user.id);
+  done(null, user._id);
 });
 
-passport.deserializeUser((id, done) => {
+passport.deserializeUser(async (id, done) => {
   console.log('deserializeUser');
-  db.users
-    .find(id)
-    .then(user => done(null, user))
-    .catch(err => done(err));
+  try {
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return done(null);
+    }
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
 });

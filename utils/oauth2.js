@@ -11,6 +11,7 @@ const passport = require('passport');
 const utils = require('./utils');
 const validate = require('./validate');
 const db = require('./db');
+const Client = require('./../models/clientModel');
 
 // create OAuth 2.0 server
 const server = oauth2orize.createServer();
@@ -284,11 +285,20 @@ exports.token = [
 // simple matter of serializing the client's ID, and deserializing by finding
 // the client by ID from the database.
 
-server.serializeClient((client, done) => done(null, client.id));
+server.serializeClient((client, done) => {
+  console.log('serializeClient', client);
+  done(null, client._id);
+});
 
-server.deserializeClient((id, done) => {
-  db.clients
-    .find(id)
-    .then(client => done(null, client))
-    .catch(err => done(err));
+server.deserializeClient(async (id, done) => {
+  console.log('deserializeClient');
+  try {
+    const client = await Client.findOne({ _id: id });
+    if (!client) {
+      return done(null);
+    }
+    done(null, client);
+  } catch (err) {
+    done(err);
+  }
 });
