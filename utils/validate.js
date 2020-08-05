@@ -1,5 +1,5 @@
 // const process = require('process');
-const tokenUtils = require('./tokenUtils');
+const utils = require('./utils');
 const db = require('./db');
 
 /** Validate object to attach all functions to  */
@@ -93,7 +93,7 @@ validate.clientExists = client => {
  */
 validate.token = (token, accessToken) => {
   console.log('validate.token');
-  tokenUtils.verifyToken(accessToken);
+  utils.verifyToken(accessToken);
 
   // token is a user token
   if (token.userID != null) {
@@ -121,7 +121,7 @@ validate.token = (token, accessToken) => {
  */
 validate.refreshToken = (token, refreshToken, client) => {
   console.log('validate.refreshToken');
-  tokenUtils.verifyToken(refreshToken);
+  utils.verifyToken(refreshToken);
   if (client.id !== token.clientID) {
     validate.logAndThrow('RefreshToken clientID does not match client id given');
   }
@@ -142,7 +142,7 @@ validate.refreshToken = (token, refreshToken, client) => {
  */
 validate.authCode = (code, authCode, client, redirectURI) => {
   console.log('validate.authCode');
-  tokenUtils.verifyToken(code);
+  utils.verifyToken(code);
   if (client.id !== authCode.clientID) {
     validate.logAndThrow('AuthCode clientID does not match client id given');
   }
@@ -169,7 +169,7 @@ validate.isRefreshToken = ({ scope }) => scope != null && scope.indexOf('offline
 validate.generateRefreshToken = ({ userId, clientID, scope }) => {
   console.log('validate.generateRefreshToken');
 
-  const refreshToken = tokenUtils.createToken({
+  const refreshToken = utils.createToken({
     sub: userId,
     exp: process.env.REFRESH_TOKEN_EXPIRES_IN
   });
@@ -185,8 +185,8 @@ validate.generateRefreshToken = ({ userId, clientID, scope }) => {
  */
 validate.generateToken = ({ userID, clientID, scope }) => {
   console.log('validate.generateToken');
-  const token = tokenUtils.createToken({ sub: userID, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
-  const expiration = tokenUtils.calculateExpirationDate();
+  const token = utils.createToken({ sub: userID, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
+  const expiration = utils.calculateExpirationDate();
   return db.accessTokens.save(token, expiration, userID, clientID, scope).then(() => token);
 };
 
@@ -215,7 +215,7 @@ validate.tokenForHttp = token =>
   new Promise((resolve, reject) => {
     try {
       console.log('validate.tokenForHttp');
-      tokenUtils.verifyToken(token);
+      utils.verifyToken(token);
     } catch (err) {
       const error = new Error('invalid_token');
       error.status = 400;

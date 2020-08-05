@@ -15,13 +15,19 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
+  username: {
+    type: String,
+    required: [true, 'Please provide your username'],
+    unique: true,
+    lowercase: true
+  },
   photo: {
     type: String,
     default: 'default.jpg'
   },
   role: {
     type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    enum: ['user', 'developer', 'admin'],
     default: 'user'
   },
   scope: {
@@ -51,6 +57,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     select: false
+  },
+  updated: {
+    type: Date
+  },
+  created: {
+    type: Date,
+    default: Date.now
   }
 });
 

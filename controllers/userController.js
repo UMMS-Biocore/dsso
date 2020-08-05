@@ -1,5 +1,5 @@
-const multer = require('multer');
-const sharp = require('sharp');
+// const multer = require('multer');
+// const sharp = require('sharp');
 const passport = require('passport');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
@@ -15,44 +15,36 @@ const factory = require('./handlerFactory');
 //     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
 //   }
 // });
-const multerStorage = multer.memoryStorage();
+// const multerStorage = multer.memoryStorage();
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
+// const multerFilter = (req, file, cb) => {
+//   if (file.mimetype.startsWith('image')) {
+//     cb(null, true);
+//   } else {
+//     cb(new AppError('Not an image! Please upload only images.', 400), false);
+//   }
+// };
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-});
+// const upload = multer({
+//   storage: multerStorage,
+//   fileFilter: multerFilter
+// });
 
-exports.uploadUserPhoto = upload.single('photo');
+// exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
+// exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+//   if (!req.file) return next();
 
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+//   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+//   await sharp(req.file.buffer)
+//     .resize(500, 500)
+//     .toFormat('jpeg')
+//     .jpeg({ quality: 90 })
+//     .toFile(`public/img/users/${req.file.filename}`);
 
-  next();
-});
-
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach(el => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
+//   next();
+// });
 
 /**
  * Simple informational end point, if you want to get information
@@ -90,6 +82,14 @@ exports.userinfo = [
 exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
   next();
+};
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -140,3 +140,21 @@ exports.getAllUsers = factory.getAll(User);
 // Do NOT update passwords with this!
 exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
+
+// manual approach
+exports.find = async id => {
+  return await User.findOne({ _id: id }, function(err, item) {
+    console.log('User find err:', err);
+    console.log('User find item:', item);
+    if (err) return err;
+    return item;
+  });
+};
+exports.findByUsername = async username => {
+  return await User.findOne({ username: username }, function(err, item) {
+    console.log('User findByUsername err:', err);
+    console.log('User findByUsername item:', item);
+    if (err) return err;
+    return item;
+  });
+};

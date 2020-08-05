@@ -8,7 +8,7 @@
 const login = require('connect-ensure-login');
 const oauth2orize = require('oauth2orize');
 const passport = require('passport');
-const tokenUtils = require('./tokenUtils');
+const utils = require('./utils');
 const validate = require('./validate');
 const db = require('./db');
 
@@ -34,7 +34,7 @@ server.grant(
     console.log(redirectURI);
     console.log(user);
 
-    const code = tokenUtils.createToken({
+    const code = utils.createToken({
       sub: user.id,
       exp: process.env.CODE_TOKEN_EXPIRES_IN
     });
@@ -59,11 +59,11 @@ server.grant(
   oauth2orize.grant.token((client, user, ares, done) => {
     console.log('oauth2orize.grant2');
 
-    const token = tokenUtils.createToken({
+    const token = utils.createToken({
       sub: user.id,
       exp: process.env.ACCESS_TOKEN_EXPIRES_IN
     });
-    const expiration = tokenUtils.calculateExpirationDate();
+    const expiration = utils.calculateExpirationDate();
 
     db.accessTokens
       .save(token, expiration, user.id, client.id, client.scope)
@@ -143,11 +143,11 @@ server.exchange(
   oauth2orize.exchange.clientCredentials((client, scope, done) => {
     console.log('oauth2orize.exchange.clientCredentials');
 
-    const token = tokenUtils.createToken({
+    const token = utils.createToken({
       sub: client.id,
       exp: process.env.ACCESS_TOKEN_EXPIRES_IN
     });
-    const expiration = tokenUtils.calculateExpirationDate();
+    const expiration = utils.calculateExpirationDate();
     // Pass in a null for user id since there is no user when using this grant type
     db.accessTokens
       .save(token, expiration, null, client.id, scope)

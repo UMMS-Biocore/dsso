@@ -1,4 +1,5 @@
 const passport = require('passport');
+const Client = require('./../models/clientModel');
 
 /*
  * Simple informational end point, if you want to get information
@@ -24,3 +25,21 @@ exports.info = [
     res.json({ client_id: req.user.id, name: req.user.name, scope: req.authInfo.scope });
   }
 ];
+
+// manual approach
+exports.find = async id => {
+  return await Client.findOne({ _id: id }, function(err, item) {
+    console.log('Client find err:', err);
+    console.log('Client find item:', item);
+    if (err) return err;
+    return item;
+  });
+};
+exports.findByClientId = async clientId => {
+  return await Client.findOne({ clientId: clientId }, function(err, item) {
+    console.log('Client findByClientId err:', err);
+    console.log('Client findByClientId item:', item);
+    if (err) return err;
+    return item;
+  });
+};
