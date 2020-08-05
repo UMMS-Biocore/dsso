@@ -33,6 +33,8 @@ exports.find = async token => {
  */
 exports.save = async (code, clientId, redirectUri, userId, scope) => {
   try {
+    console.log('**** authorization code save1');
+
     const id = jwt.decode(code).jti;
     const newToken = new AuthCode({
       id: id,
@@ -43,8 +45,10 @@ exports.save = async (code, clientId, redirectUri, userId, scope) => {
     });
     const saveToken = await newToken.save();
     console.log('**** authorization code saved');
+    console.log('savedToken: ', saveToken);
     return saveToken;
   } catch (err) {
+    console.log(err);
     return err;
   }
 };
@@ -55,8 +59,10 @@ exports.save = async (code, clientId, redirectUri, userId, scope) => {
  */
 exports.delete = async token => {
   const id = jwt.decode(token).jti;
+  console.log(id);
   return await AuthCode.findOneAndRemove({ id: id }, function(err, item) {
     console.log('authorization delete err:', err);
+    console.log('authorization delete item:', item);
     if (err) {
       return err;
     }
