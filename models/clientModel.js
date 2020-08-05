@@ -38,6 +38,6 @@ clientSchema.pre('save', function(next) {
   next();
 });
 
-const User = mongoose.model('User', clientSchema);
+const Client = mongoose.model('Client', clientSchema);
 
-module.exports = User;
+module.exports = Client;

@@ -20,12 +20,6 @@ const RefreshTokenSchema = new mongoose.Schema({
   }
 });
 
-// userSchema.pre(/^find/, function(next) {
-//   // this points to the current query
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
-
 const RefreshToken = mongoose.model('RefreshToken', RefreshTokenSchema);
 
 module.exports = RefreshToken;

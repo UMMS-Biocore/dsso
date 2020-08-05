@@ -25,12 +25,6 @@ const AccessTokenSchema = new mongoose.Schema({
   }
 });
 
-// userSchema.pre(/^find/, function(next) {
-//   // this points to the current query
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
-
 const AccessToken = mongoose.model('AccessToken', AccessTokenSchema);
 
 module.exports = AccessToken;

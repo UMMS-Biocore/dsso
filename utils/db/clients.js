@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This is the configuration of the clients that are allowed to connected to your authorization
  * server. These represent client applications that can connect. At a minimum you need the required
@@ -19,23 +17,27 @@
  * gets full scope access without the user having to make a decision to allow or disallow the scope
  * access.
  */
-const clients = [{
-  id            : '1',
-  name          : 'Samplr',
-  clientId      : 'abc123',
-  clientSecret  : 'ssh-secret',
-}, {
-  id            : '2',
-  name          : 'Samplr2',
-  clientId      : 'xyz123',
-  clientSecret  : 'ssh-password',
-}, {
-  id            : '3',
-  name          : 'Samplr3',
-  clientId      : 'trustedClient',
-  clientSecret  : 'ssh-otherpassword',
-  trustedClient : true,
-}];
+const clients = [
+  {
+    id: '1',
+    name: 'Samplr',
+    clientId: 'abc123',
+    clientSecret: 'ssh-secret'
+  },
+  {
+    id: '2',
+    name: 'Samplr2',
+    clientId: 'xyz123',
+    clientSecret: 'ssh-password'
+  },
+  {
+    id: '3',
+    name: 'Samplr3',
+    clientId: 'trustedClient',
+    clientSecret: 'ssh-otherpassword',
+    trustedClient: true
+  }
+];
 
 /**
  * Returns a client if it finds one, otherwise returns null if a client is not found.
