@@ -1,5 +1,7 @@
-const db = require('./../utils/db');
 const validate = require('./../utils/validate');
+const clients = require('./../controllers/clientController.js');
+const accessTokens = require('./../controllers/accessTokenController.js');
+const refreshTokens = require('./../controllers/refreshTokenController.js');
 
 /**
  * This endpoint is for verifying a token.  This has the same signature to
@@ -22,29 +24,21 @@ const validate = require('./../utils/validate');
  * @param   {Object}  res - The response
  * @returns {Promise} Returns the promise for testing only
  */
-exports.info = (req, res) => {
+exports.info = async (req, res) => {
   console.log(req.query);
-  validate
-    .tokenForHttp(req.query.access_token)
-    .then(() => db.accessTokens.find(req.query.access_token))
-    .then(token => validate.tokenExistsForHttp(token))
-    .then(token =>
-      db.clients
-        .find(token.clientID)
-        .then(client => validate.clientExistsForHttp(client))
-        .then(client => ({ client, token }))
-    )
-    .then(({ client, token }) => {
-      console.log('token', token);
-      console.log('token.expirationDate:', token.expirationDate.getTime());
-      console.log('Date.now:', Date.now());
-      const expirationLeft = Math.floor((token.expirationDate.getTime() - Date.now()) / 1000);
-      res.json({ audience: client.clientId, expires_in: expirationLeft });
-    })
-    .catch(err => {
-      res.status(err.status);
-      res.json({ error: err.message });
-    });
+  try {
+    await validate.tokenForHttp(req.query.access_token);
+    const token = await accessTokens.find(req.query.access_token);
+    const clientOrUserData = await validate.tokenExistsForHttp(token);
+    const client = await clients.find(clientOrUserData.clientId);
+    const validatedClient = validate.clientExistsForHttp(client);
+    const expirationLeft = Math.floor((token.expirationDate.getTime() - Date.now()) / 1000);
+    console.log('expirationLeft:', expirationLeft);
+    if (expirationLeft < 0) return res.status(400).json({ error: 'expired_token' });
+    res.json({ audience: validatedClient.clientId, expires_in: expirationLeft });
+  } catch (err) {
+    res.status(err.status).json({ error: err.message });
+  }
 };
 
 /**
@@ -68,21 +62,22 @@ exports.info = (req, res) => {
  * @param   {Object}  res - The response
  * @returns {Promise} Returns the promise for testing
  */
-exports.revoke = (req, res) =>
-  validate
-    .tokenForHttp(req.query.token)
-    .then(() => db.accessTokens.delete(req.query.token))
-    .then(token => {
-      if (token == null) {
-        return db.refreshTokens.delete(req.query.token);
-      }
-      return token;
-    })
-    .then(tokenDeleted => validate.tokenExistsForHttp(tokenDeleted))
-    .then(() => {
-      res.json({});
-    })
-    .catch(err => {
-      res.status(err.status);
-      res.json({ error: err.message });
-    });
+exports.revoke = async (req, res) => {
+  console.log('revoke');
+  try {
+    const tokenCheck = validate.tokenForHttp(req.query.token);
+    console.log('tokenCheck', tokenCheck);
+    const token = await accessTokens.delete(req.query.token);
+    console.log('token', token);
+    let tokenDeleted = token;
+    if (token == null) {
+      tokenDeleted = await refreshTokens.delete(req.query.token);
+    }
+    const validateTokenDel = validate.tokenExistsForHttp(tokenDeleted);
+    console.log(validateTokenDel);
+    res.json({});
+  } catch (err) {
+    res.status(err.status);
+    res.json({ error: err.message });
+  }
+};

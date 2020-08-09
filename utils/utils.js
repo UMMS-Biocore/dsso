@@ -48,7 +48,6 @@ exports.verifyToken = token => {
 };
 
 exports.calculateExpirationDate = () => {
-  console.log('calculateExpirationDate');
   return new Date(Date.now() + process.env.ACCESS_TOKEN_EXPIRES_IN * 1000);
 };
 
