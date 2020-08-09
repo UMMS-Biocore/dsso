@@ -23,8 +23,9 @@ cp docs/template.config.env config.env
 npm install
 ```
 
-## Starting Server:
+## Starting MongoDB and Node.js Server:
 
 ```
+mongod
 npm run start
 ```

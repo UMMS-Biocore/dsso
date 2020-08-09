@@ -59,12 +59,12 @@ exports.save = async (code, clientId, redirectUri, userId, scope) => {
 exports.delete = async token => {
   const id = jwt.decode(token).jti;
   console.log(id);
-  return await AuthCode.findOneAndRemove({ id: id }, function(err, item) {
-    console.log('authorization delete err:', err);
+  try {
+    const item = await AuthCode.findOneAndRemove({ id: id });
     console.log('authorization delete item:', item);
-    if (err) {
-      return err;
-    }
     return item;
-  });
+  } catch (err) {
+    console.log('authorization delete err:', err);
+    return err;
+  }
 };

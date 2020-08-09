@@ -16,7 +16,7 @@ const RefreshTokenSchema = new mongoose.Schema({
     required: true
   },
   scope: {
-    type: String
+    type: Array
   }
 });
 

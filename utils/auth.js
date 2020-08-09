@@ -95,10 +95,14 @@ passport.use(
     console.log('BearerStrategy');
     try {
       const token = await accessTokens.find(accessToken);
-      if (!token || !(await validate.token(token, accessToken))) {
+      console.log(`BearerStrategy accessToken: ${accessToken}`);
+      console.log(`BearerStrategy token: ${token}`);
+      const clientOrUserData = await validate.token(token, accessToken);
+      console.log(`BearerStrategy token: ${clientOrUserData}`);
+      if (!token || !clientOrUserData) {
         return done(null, false);
       }
-      done(null, token, { scope: '*' });
+      done(null, clientOrUserData, { scope: '*' });
     } catch {
       done(null, false);
     }

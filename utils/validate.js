@@ -1,6 +1,9 @@
 // const process = require('process');
 const utils = require('./utils');
-const db = require('./db');
+const accessTokens = require('./../controllers/accessTokenController');
+const refreshTokens = require('./../controllers/refreshTokenController');
+const User = require('./../models/userModel');
+const Client = require('./../models/clientModel');
 
 /** Validate object to attach all functions to  */
 const validate = Object.create(null);
@@ -91,22 +94,16 @@ validate.clientExists = client => {
  * @throws  {Error}   If the token is not valid
  * @returns {Promise} Resolved with the user or client associated with the token if valid
  */
-validate.token = (token, accessToken) => {
+validate.token = async (token, accessToken) => {
   console.log('validate.token');
   utils.verifyToken(accessToken);
 
   // token is a user token
-  if (token.userID != null) {
-    return db.users
-      .find(token.userID)
-      .then(user => validate.userExists(user))
-      .then(user => user);
+  if (token.userId != null) {
+    return await User.findOne({ _id: token.userId });
   }
   // token is a client token
-  return db.clients
-    .find(token.clientID)
-    .then(client => validate.clientExists(client))
-    .then(client => client);
+  return await Client.findOne({ _id: token.clientId });
 };
 
 /**
@@ -122,7 +119,7 @@ validate.token = (token, accessToken) => {
 validate.refreshToken = (token, refreshToken, client) => {
   console.log('validate.refreshToken');
   utils.verifyToken(refreshToken);
-  if (client.id !== token.clientID) {
+  if (client.id !== token.clientId) {
     validate.logAndThrow('RefreshToken clientID does not match client id given');
   }
   return token;
@@ -143,10 +140,10 @@ validate.refreshToken = (token, refreshToken, client) => {
 validate.authCode = (code, authCode, client, redirectURI) => {
   console.log('validate.authCode', authCode);
   utils.verifyToken(code);
-  if (client.id !== authCode.clientID) {
+  if (client.id !== authCode.clientId) {
     validate.logAndThrow('AuthCode clientID does not match client id given');
   }
-  if (redirectURI !== authCode.redirectURI) {
+  if (redirectURI !== authCode.redirectUri) {
     validate.logAndThrow('AuthCode redirectURI does not match redirectURI given');
   }
   return authCode;
@@ -166,14 +163,14 @@ validate.isRefreshToken = ({ scope }) => scope != null && scope.indexOf('offline
  * @throws  {Object}  scope    - the scope
  * @returns {Promise} The resolved refresh token after saved
  */
-validate.generateRefreshToken = ({ userId, clientID, scope }) => {
+validate.generateRefreshToken = async ({ userId, clientId, scope }) => {
   console.log('validate.generateRefreshToken');
-
   const refreshToken = utils.createToken({
     sub: userId,
     exp: process.env.REFRESH_TOKEN_EXPIRES_IN
   });
-  return db.refreshTokens.save(refreshToken, userId, clientID, scope).then(() => refreshToken);
+  await refreshTokens.save(refreshToken, userId, clientId, scope);
+  return refreshToken;
 };
 
 /**
@@ -183,11 +180,15 @@ validate.generateRefreshToken = ({ userId, clientID, scope }) => {
  * @param   {scope}    scope    - The scope
  * @returns {Promise}  The resolved refresh token after saved
  */
-validate.generateToken = ({ userID, clientID, scope }) => {
+validate.generateToken = async ({ userId, clientId, scope }) => {
   console.log('validate.generateToken');
-  const token = utils.createToken({ sub: userID, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
+  const token = utils.createToken({ sub: userId, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
   const expiration = utils.calculateExpirationDate();
-  return db.accessTokens.save(token, expiration, userID, clientID, scope).then(() => token);
+  console.log('scope', scope);
+  console.log('userID', userId);
+  console.log('clientID', clientId);
+  await accessTokens.save(token, expiration, userId, clientId, scope);
+  return token;
 };
 
 /**
@@ -198,7 +199,7 @@ validate.generateToken = ({ userID, clientID, scope }) => {
  * @returns {Promise} The resolved refresh and access tokens as an array
  */
 validate.generateTokens = authCode => {
-  console.log('validate.generateTokens');
+  console.log('validate.generateTokens authCode:', authCode);
   if (validate.isRefreshToken(authCode)) {
     return Promise.all([validate.generateToken(authCode), validate.generateRefreshToken(authCode)]);
   }

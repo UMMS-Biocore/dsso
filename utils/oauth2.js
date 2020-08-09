@@ -94,8 +94,11 @@ server.exchange(
       const authCode = await authCodes.delete(code);
       console.log('deleted authCode', authCode);
       const validated = validate.authCode(code, authCode, client, redirectURI);
+      console.log('validated authCode', validated);
+
       if (!validated) return done(false);
-      const tokens = await validate.generateTokens(authCode);
+      const tokens = await validate.generateTokens(validated);
+      console.log('validated generateTokens', tokens);
       if (tokens.length === 1) {
         return done(null, tokens[0], null, expiresIn);
       }
