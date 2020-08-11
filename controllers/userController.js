@@ -145,7 +145,6 @@ exports.deleteUser = factory.deleteOne(User);
 exports.find = async id => {
   return await User.findOne({ _id: id }, function(err, item) {
     console.log('User find err:', err);
-    console.log('User find item:', item);
     if (err) return err;
     return item;
   });
@@ -153,7 +152,6 @@ exports.find = async id => {
 exports.findByUsername = async username => {
   return await User.findOne({ username: username }, function(err, item) {
     console.log('User findByUsername err:', err);
-    console.log('User findByUsername item:', item);
     if (err) return err;
     return item;
   });

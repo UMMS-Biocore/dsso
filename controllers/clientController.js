@@ -30,7 +30,6 @@ exports.info = [
 exports.find = async id => {
   return await Client.findOne({ _id: id }, function(err, item) {
     console.log('Client find err:', err);
-    console.log('Client find item:', item);
     if (err) return err;
     return item;
   });
@@ -38,7 +37,6 @@ exports.find = async id => {
 exports.findByClientId = async clientId => {
   return await Client.findOne({ clientId: clientId }, function(err, item) {
     console.log('Client findByClientId err:', err);
-    console.log('Client findByClientId item:', item);
     if (err) return err;
     return item;
   });

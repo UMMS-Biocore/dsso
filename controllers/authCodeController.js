@@ -12,8 +12,7 @@ const AuthCode = require('../models/authCodeModel');
 exports.find = async token => {
   const id = jwt.decode(token).jti;
   return await AuthCode.findOne({ id: id }, function(err, item) {
-    console.log('authorization code find err:', err);
-    console.log('authorization code find item:', item);
+    console.log('authorization code find:', err, item);
     if (err) {
       return err;
     }
@@ -33,7 +32,6 @@ exports.find = async token => {
  */
 exports.save = async (code, clientId, redirectUri, userId, scope) => {
   try {
-    console.log('**** authorization code will be saved');
     const id = jwt.decode(code).jti;
     const newToken = new AuthCode({
       id: id,
@@ -43,8 +41,7 @@ exports.save = async (code, clientId, redirectUri, userId, scope) => {
       scope: scope
     });
     const saveToken = await newToken.save();
-    console.log('**** authorization code saved');
-    console.log('savedToken: ', saveToken);
+    console.log('**** authorization token (saved): ', saveToken);
     return saveToken;
   } catch (err) {
     console.log(err);
@@ -58,10 +55,8 @@ exports.save = async (code, clientId, redirectUri, userId, scope) => {
  */
 exports.delete = async token => {
   const id = jwt.decode(token).jti;
-  console.log(id);
   try {
     const item = await AuthCode.findOneAndRemove({ id: id });
-    console.log('authorization delete item:', item);
     return item;
   } catch (err) {
     console.log('authorization delete err:', err);

@@ -12,7 +12,6 @@ exports.find = async token => {
   const id = jwt.decode(token).jti;
   return await RefreshToken.findOne({ id: id }, function(err, item) {
     console.log('RefreshToken find err:', err);
-    console.log('RefreshToken find item:', item);
     if (err) {
       return err;
     }

@@ -35,16 +35,11 @@ const expiresIn = { expires_in: process.env.ACCESS_TOKEN_EXPIRES_IN };
 server.grant(
   oauth2orize.grant.code(async (client, redirectURI, user, ares, done) => {
     console.log('oauth2orize.grant.code');
-    console.log(client);
-    console.log(user);
     try {
       const code = utils.createToken({
         sub: user._id,
         exp: process.env.CODE_TOKEN_EXPIRES_IN
       });
-      console.log('init authCodes.save');
-      console.log('code:', code);
-
       await authCodes.save(code, client._id, redirectURI, user._id, client.scope);
       done(null, code);
     } catch (err) {
@@ -92,13 +87,9 @@ server.exchange(
     console.log('oauth2orize.exchange.code');
     try {
       const authCode = await authCodes.delete(code);
-      console.log('deleted authCode', authCode);
       const validated = validate.authCode(code, authCode, client, redirectURI);
-      console.log('validated authCode', validated);
-
       if (!validated) return done(false);
       const tokens = await validate.generateTokens(validated);
-      console.log('validated generateTokens', tokens);
       if (tokens.length === 1) {
         return done(null, tokens[0], null, expiresIn);
       }
@@ -156,14 +147,12 @@ server.exchange(
 server.exchange(
   oauth2orize.exchange.clientCredentials(async (client, scope, done) => {
     console.log('oauth2orize.exchange.clientCredentials');
-
     try {
       const token = utils.createToken({
         sub: client._id,
         exp: process.env.ACCESS_TOKEN_EXPIRES_IN
       });
       const expiration = utils.calculateExpirationDate();
-      console.log('token: ', token);
       await accessTokens.save(token, expiration, null, client._id, scope);
       done(null, token, null, expiresIn);
     } catch (err) {
@@ -211,6 +200,67 @@ server.exchange(
  * authorization).  We accomplish that here by routing through `ensureLoggedIn()`
  * first, and rendering the `dialog` view.
  */
+const checkLoggedIn = () => {
+  return function(req, res, next) {
+    console.log(req.user);
+    console.log(req.query);
+    const redirectOriginal = req.query.redirect_original;
+    if (req.user) {
+      //user signed in
+      next();
+    } else {
+      res.redirect(redirectOriginal);
+    }
+  };
+};
+
+exports.check_authorization = [
+  checkLoggedIn(),
+  server.authorization(async (clientID, redirectURI, scope, done) => {
+    console.log('server.authorization');
+    console.log('clientID', clientID);
+    console.log('redirectURI', redirectURI);
+    try {
+      const client = await clients.findByClientId(clientID);
+      if (client) {
+        client.scope = scope;
+        // WARNING: For security purposes, it is highly advisable to check that
+        // redirectURI provided by the client matches one registered with the server.
+      }
+      return done(null, client, redirectURI);
+    } catch (err) {
+      done(err);
+    }
+  }),
+  async (req, res, next) => {
+    console.log('render dialog');
+    // Render the decision dialog if the client isn't a trusted client
+    // TODO:  Make a mechanism so that if this isn't a trusted client, the user can record that
+    // they have consented but also make a mechanism so that if the user revokes access to any of
+    // the clients then they will have to re-consent.
+    try {
+      const client = await clients.findByClientId(req.query.client_id);
+      if (client != null && client.trustedClient && client.trustedClient === true) {
+        // This is how we short call the decision like the dialog below does
+        server.decision({ loadTransaction: false }, (serverReq, callback) => {
+          callback(null, { allow: true });
+        })(req, res, next);
+      } else {
+        res.render('dialog', {
+          transactionID: req.oauth2.transactionID,
+          user: req.user,
+          client: req.oauth2.client
+        });
+      }
+    } catch {
+      res.render('dialog', {
+        transactionID: req.oauth2.transactionID,
+        user: req.user,
+        client: req.oauth2.client
+      });
+    }
+  }
+];
 
 exports.authorization = [
   login.ensureLoggedIn(),
@@ -218,8 +268,6 @@ exports.authorization = [
     console.log('server.authorization');
     try {
       const client = await clients.findByClientId(clientID);
-      console.log('client', client);
-      console.log('scope', scope);
       if (client) {
         client.scope = scope;
         // WARNING: For security purposes, it is highly advisable to check that

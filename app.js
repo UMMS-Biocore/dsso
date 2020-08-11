@@ -65,14 +65,6 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 
-// app.use(
-//   expressSession({
-//     saveUninitialized: true,
-//     resave: true,
-//     secret: process.env.SESSION_SECRET
-//   })
-// );
-
 console.log('Using MemoryStore for the data store');
 console.log('Using MemoryStore for the Session');
 const MemoryStore = expressSession.MemoryStore;
@@ -118,11 +110,10 @@ app.use(
 app.use(compression());
 
 // Test middleware
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  // console.log(req.cookies);
-  next();
-});
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   next();
+// });
 
 // Clean up expired tokens in the database
 setInterval(() => {

@@ -184,9 +184,6 @@ validate.generateToken = async ({ userId, clientId, scope }) => {
   console.log('validate.generateToken');
   const token = utils.createToken({ sub: userId, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
   const expiration = utils.calculateExpirationDate();
-  console.log('scope', scope);
-  console.log('userID', userId);
-  console.log('clientID', clientId);
   await accessTokens.save(token, expiration, userId, clientId, scope);
   return token;
 };

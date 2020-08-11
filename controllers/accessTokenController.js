@@ -8,8 +8,7 @@ const AccessToken = require('../models/accessTokenModel');
 exports.find = async token => {
   const id = jwt.decode(token).jti;
   return await AccessToken.findOne({ id: id }, function(err, item) {
-    console.log('accesstoken find err1:', err);
-    console.log('accesstoken find item1:', item);
+    console.log('accesstoken find:', err, item);
     if (err) {
       return err;
     }

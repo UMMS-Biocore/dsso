@@ -60,7 +60,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  // console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, req, res);
@@ -132,15 +131,11 @@ exports.isLoggedIn = async (req, res, next) => {
     try {
       // 1) verify token
       const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-      console.log(decoded);
-
       // 2) Check if user still exists
       const currentUser = await User.findById(decoded.id);
-      console.log(currentUser);
       if (!currentUser) {
         return next();
       }
-
       // THERE IS A LOGGED IN USER
       res.locals.user = currentUser;
       return next();

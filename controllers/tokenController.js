@@ -25,7 +25,6 @@ const refreshTokens = require('./../controllers/refreshTokenController.js');
  * @returns {Promise} Returns the promise for testing only
  */
 exports.info = async (req, res) => {
-  console.log(req.query);
   try {
     await validate.tokenForHttp(req.query.access_token);
     const token = await accessTokens.find(req.query.access_token);
@@ -33,7 +32,6 @@ exports.info = async (req, res) => {
     const client = await clients.find(clientOrUserData.clientId);
     const validatedClient = validate.clientExistsForHttp(client);
     const expirationLeft = Math.floor((token.expirationDate.getTime() - Date.now()) / 1000);
-    console.log('expirationLeft:', expirationLeft);
     if (expirationLeft < 0) return res.status(400).json({ error: 'expired_token' });
     res.json({ audience: validatedClient.clientId, expires_in: expirationLeft });
   } catch (err) {
