@@ -1,18 +1,15 @@
 const crypto = require('crypto');
 const passport = require('passport');
 // const request = require('request');
-const { get, post } = require('request');
+// const { get, post } = require('request');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Email = require('./../utils/email');
-const accessTokens = require('./../controllers/accessTokenController');
-const refreshTokens = require('./../controllers/refreshTokenController');
-// import { get, post } from 'request';
 
-const [getAsync, postAsync] = [get, post].map(promisify);
+// const [getAsync, postAsync] = [get, post].map(promisify);
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -38,16 +35,6 @@ const createSendToken = (user, statusCode, req, res) => {
     data: {
       user
     }
-  });
-};
-
-const sendTokenCookie = (user, req, res) => {
-  const token = signToken(user._id);
-
-  res.cookie('jwt', token, {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   });
 };
 
