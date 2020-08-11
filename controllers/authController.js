@@ -66,40 +66,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   createSendToken(newUser, 201, req, res);
 });
 
-// exports.login = catchAsync(async (req, res, next) => {
-//   const { email, password } = req.body;
-//   // 1) Check if email and password exist
-//   if (!email || !password) {
-//     return next(new AppError('Please provide email and password!', 400));
-//   }
-//   // 2) Check if user exists && password is correct
-//   const user = await User.findOne({ email }).select('+password');
-
-//   if (!user || !(await user.correctPassword(password, user.password))) {
-//     return next(new AppError('Incorrect email or password', 401));
-//   }
-
-//   // 3) If everything ok, send token to client
-//   createSendToken(user, 200, req, res);
-// });
-
-// exports.logout = async (req, res) => {
-//   req.session.isAuthorized = false;
-
-//   const { statusCode, body } = await getAsync({
-//     url: `${process.env.SSO_URL}logout`,
-//     rejectUnauthorized: false
-//   });
-//   console.log('statusCode', statusCode);
-//   console.log('body', body);
-
-//   res.cookie('jwt', 'loggedout', {
-//     expires: new Date(Date.now() + 10 * 1000),
-//     httpOnly: true
-//   });
-//   res.status(200).json({ status: 'success' });
-// };
-
 /**
  * Authenticate normal login page using strategy of authenticate
  */
@@ -110,11 +76,6 @@ exports.login = [
   })
 ];
 
-// exports.login = (req, res) => {
-//   console.log(req.body);
-//   res.redirect('/login');
-// };
-
 /**
  * Logout of the system and redirect to root
  * @param   {Object}   req - The request
@@ -122,8 +83,14 @@ exports.login = [
  * @returns {undefined}
  */
 exports.logout = (req, res) => {
+  let redirect = '';
+  if (req.query && req.query.redirect_uri) {
+    redirect = req.query.redirect_uri;
+  } else {
+    redirect = '/';
+  }
   req.logout();
-  res.redirect('/');
+  res.redirect(redirect);
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -182,129 +149,6 @@ exports.isLoggedIn = async (req, res, next) => {
     }
   }
   next();
-};
-
-exports.ensureSingleSignOn = async (req, res, next) => {
-  if (!req.session.isAuthorized) {
-    // req.session.redirectURL = req.originalUrl || req.url;
-    req.session.redirectURL = '/';
-    res.redirect(
-      `${process.env.SSO_AUTHORIZE_URL}?redirect_uri=${
-        process.env.SSO_REDIRECT_URL
-      }&response_type=code&client_id=${process.env.CLIENT_ID}&scope=offline_access`
-    );
-  } else {
-    res.locals.user = req.session.user;
-    next();
-  }
-};
-
-/**
- * https://localhost:4000/receivetoken?code=(authorization code)
- *
- * This is part of the single sign on using the OAuth2 Authorization Code grant type.  This is the
- * redirect from the authorization server.  If you send in a bad authorization code you will get the
- * response code of 400 and the message of
- * {
- *     "error": "invalid_grant",
- *     "error_description": "invalid code"
- * }
- * @param   {Object} req - The request which should have the parameter query of
- *                         ?code=(authorization code)
- * @param   {Object} res - We use this to redirect to the original URL that needed to
- *                         authenticate with the authorization server.
- * @returns {undefined}
- */
-
-exports.ssoReceiveToken = async (req, res, next) => {
-  // Get the token
-  console.log('**ssoReceiveToken');
-  try {
-    const { statusCode, body } = await postAsync(process.env.SSO_URL + process.env.SSO_TOKEN_URL, {
-      form: {
-        code: req.query.code,
-        redirect_uri: process.env.SSO_REDIRECT_URL,
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
-        grant_type: 'authorization_code'
-      }
-    });
-    const msg = JSON.parse(body);
-    const accessToken = msg.access_token;
-    const refreshToken = msg.refresh_token;
-    const expiresIn = msg.expires_in;
-
-    if (statusCode === 200 && accessToken != null) {
-      req.session.accessToken = accessToken;
-      req.session.refreshToken = refreshToken;
-      req.session.isAuthorized = true;
-      const expirationDate = expiresIn ? new Date(Date.now() + expiresIn * 1000) : null;
-
-      const userInfoObj = await getAsync({
-        url: process.env.SSO_USER_INFO_URL,
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        },
-        rejectUnauthorized: false
-      });
-      const currentUser = JSON.parse(userInfoObj.body);
-      const userStatusCode = userInfoObj.statusCode;
-      const userId = currentUser._id;
-      const scope = currentUser.scope;
-      const email = currentUser.email;
-
-      if (userStatusCode === 200 && userId) {
-        try {
-          const filter = { email: email };
-          const update = { $set: { name: currentUser.name, email: email, scope: scope } };
-          const options = { upsert: true, new: true, setDefaultsOnInsert: true };
-          const updatedUser = await User.findOneAndUpdate(filter, update, options);
-          console.log('updatedUser', updatedUser);
-          res.locals.user = updatedUser;
-          sendTokenCookie(updatedUser, req, res);
-
-          await accessTokens.save(
-            accessToken,
-            expirationDate,
-            userId,
-            process.env.CLIENT_ID,
-            scope
-          );
-          if (refreshToken != null) {
-            await refreshTokens.save(refreshToken, userId, process.env.CLIENT_ID, scope);
-          }
-          res.redirect(req.session.redirectURL);
-        } catch (err) {
-          res.sendStatus(500);
-        }
-      } else {
-        res.status(userStatusCode);
-        res.send(userInfoObj.body);
-      }
-    } else {
-      // Error, someone is trying to put a bad authorization code in
-      res.status(statusCode);
-      res.send(body);
-    }
-  } catch (e) {
-    return next(new AppError('Login Failed', 403));
-  }
-
-  // request.post(
-  //   process.env.SSO_URL + process.env.SSO_TOKEN_URL,
-  //   {
-  //     form: {
-  //       code: req.query.code,
-  //       redirect_uri: process.env.SSO_REDIRECT_URL,
-  //       client_id: process.env.CLIENT_ID,
-  //       client_secret: process.env.CLIENT_SECRET,
-  //       grant_type: 'authorization_code'
-  //     }
-  //   },
-  //   async (error, response, body) => {
-
-  //   }
-  // );
 };
 
 exports.restrictTo = (...roles) => {
