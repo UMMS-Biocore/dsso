@@ -16,8 +16,4 @@ router.get('/dialog/authorize', oauth2.authorization);
 router.get('/dialog/check', oauth2.check_authorization);
 // router.post('/dialog/authorize/decision', oauth2.decision);
 
-// router.get('/my-tours', authController.protect, viewsController.getMyTours);
-
-// router.post('/submit-user-data', authController.protect, viewsController.updateUserData);
-
 module.exports = router;
