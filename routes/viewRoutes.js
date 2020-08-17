@@ -5,8 +5,6 @@ const oauth2 = require('../utils/oauth2.js');
 
 const router = express.Router();
 
-router.use(viewsController.alerts);
-
 router.get('/', authController.isLoggedIn, viewsController.getOverview);
 router.get('/login', viewsController.getLoginForm);
 router.post('/login', authController.login);

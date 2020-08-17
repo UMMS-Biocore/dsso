@@ -33,7 +33,12 @@ exports.info = async (req, res) => {
     const validatedClient = validate.clientExistsForHttp(client);
     const expirationLeft = Math.floor((token.expirationDate.getTime() - Date.now()) / 1000);
     if (expirationLeft < 0) return res.status(400).json({ error: 'expired_token' });
-    res.json({ audience: validatedClient.clientId, expires_in: expirationLeft });
+    res.json({
+      audience: validatedClient.clientId,
+      scope: clientOrUserData.scope,
+      user_id: clientOrUserData.userId,
+      expires_in: expirationLeft
+    });
   } catch (err) {
     res.status(err.status).json({ error: err.message });
   }

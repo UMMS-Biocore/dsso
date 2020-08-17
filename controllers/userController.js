@@ -1,41 +1,8 @@
-const multer = require('multer');
-const sharp = require('sharp');
 const passport = require('passport');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
-
-const multerStorage = multer.memoryStorage();
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-});
-
-exports.uploadUserPhoto = upload.single('photo');
-
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
-
-  next();
-});
 
 /**
  * Simple informational end point, if you want to get information
@@ -61,10 +28,12 @@ exports.userinfo = [
     // `BearerStrategy`.  It is typically used to indicate scope of the token,
     // and used in access control checks.  For illustrative purposes, this
     // example simply returns the scope in the response.
+    console.log('req.user', req.user);
     res.json({
       _id: req.user.id,
       name: req.user.name,
       email: req.user.email,
+      username: req.user.username,
       scope: req.authInfo.scope
     });
   }
@@ -125,12 +94,12 @@ exports.createUser = (req, res) => {
   });
 };
 
-exports.getUser = factory.getOne(User);
-exports.getAllUsers = factory.getAll(User);
+// exports.getUser = factory.getOne(User);
+// exports.getAllUsers = factory.getAll(User);
 
 // Do NOT update passwords with this!
-exports.updateUser = factory.updateOne(User);
-exports.deleteUser = factory.deleteOne(User);
+// exports.updateUser = factory.updateOne(User);
+// exports.deleteUser = factory.deleteOne(User);
 
 // manual approach
 exports.find = async id => {
