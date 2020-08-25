@@ -29,6 +29,7 @@ exports.find = async token => {
 exports.save = async (token, expirationDate, userId, clientId, scope) => {
   try {
     const id = jwt.decode(token).jti;
+    console.log('token id:', id);
     const newToken = new AccessToken({
       id: id,
       expirationDate: expirationDate,
@@ -40,7 +41,10 @@ exports.save = async (token, expirationDate, userId, clientId, scope) => {
     console.log('**** AccessToken saved');
     return saveToken;
   } catch (err) {
-    return err;
+    console.log('** AccessToken not saved:', err);
+    const error = new Error('AccessToken cannot not saved.');
+    error.status = 400;
+    throw error;
   }
 };
 

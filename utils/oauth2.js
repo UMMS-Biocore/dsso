@@ -118,11 +118,11 @@ server.exchange(
       if (!user || !(await user.correctPassword(password, user.password))) {
         return done(null, false);
       }
-
+      console.log('client', client);
       const tokens = await validate.generateTokens({
         scope,
-        userID: user._id,
-        clientID: client._id
+        userId: user._id,
+        clientId: client._id
       });
       if (tokens.length === 1) {
         return done(null, tokens[0], null, expiresIn);

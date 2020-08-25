@@ -182,10 +182,14 @@ validate.generateRefreshToken = async ({ userId, clientId, scope }) => {
  */
 validate.generateToken = async ({ userId, clientId, scope }) => {
   console.log('validate.generateToken');
-  const token = utils.createToken({ sub: userId, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
-  const expiration = utils.calculateExpirationDate();
-  await accessTokens.save(token, expiration, userId, clientId, scope);
-  return token;
+  try {
+    const token = utils.createToken({ sub: userId, exp: process.env.ACCESS_TOKEN_EXPIRES_IN });
+    const expiration = utils.calculateExpirationDate();
+    await accessTokens.save(token, expiration, userId, clientId, scope);
+    return token;
+  } catch (err) {
+    return null;
+  }
 };
 
 /**
