@@ -43,14 +43,16 @@ passport.use(
  */
 passport.use(
   new BasicStrategy(async (clientId, clientSecret, done) => {
-    console.log('BasicStrategy');
+    console.log('** BasicStrategy');
     try {
       const client = await Client.findOne({ clientId }).select('+clientSecret');
       if (!client || !(await validate.client(client, clientSecret))) {
         return done(null, false);
       }
+      console.log('** BasicStrategy passed');
       done(null, client);
     } catch {
+      console.log('** BasicStrategy failed');
       done(null, false);
     }
   })

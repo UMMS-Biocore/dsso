@@ -19,13 +19,12 @@ const publicKey = fs.readFileSync(path.join(__dirname, './../certs/certificate.p
  * @param  {String} sub - The subject or identity of the token.
  * @return {String} The JWT Token
  */
-exports.createToken = ({ sub = '' } = {}) => {
-  console.log('createToken');
+exports.createToken = ({ sub = '', exp = 60 } = {}) => {
   const token = jwt.sign(
     {
       jti: uuidv4(),
       sub,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60
+      exp: Math.floor(Date.now() / 1000) + exp * 1
     },
     privateKey,
     {
@@ -43,8 +42,9 @@ exports.createToken = ({ sub = '' } = {}) => {
  * @returns {Object} The token decoded and verified
  */
 exports.verifyToken = token => {
-  console.log('verifyToken');
+  console.log('verifyToken', token);
   jwt.verify(token, publicKey);
+  console.log('token Verified');
 };
 
 exports.calculateExpirationDate = () => {

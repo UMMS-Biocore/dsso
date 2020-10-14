@@ -216,7 +216,6 @@ validate.generateTokens = authCode => {
 validate.tokenForHttp = token =>
   new Promise((resolve, reject) => {
     try {
-      console.log('validate.tokenForHttp');
       utils.verifyToken(token);
     } catch (err) {
       const error = new Error('invalid_token');
