@@ -32,7 +32,6 @@ body {
   font-weight: 300;
   font-family: 'Lato', sans-serif;
   color: #777;
-  padding: 3rem;
   min-height: 100vh;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1025,7 +1024,7 @@ body {
 }
 
 .card-container {
-  max-width: 120rem;
+  max-width: 100rem;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
