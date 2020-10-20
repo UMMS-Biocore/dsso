@@ -1,15 +1,43 @@
-extends base
+extends /_layout/pages
 
-block content
-  main.main
-    .login-form
-      h2.heading-secondary.ma-bt-lg Log into your account
-      form.form.form--login(action='/login', method='post')
-        .form__group
-          label.form__label(for='email') Email address or Username
-          input#username.form__input(name='username', placeholder='', required)
-        .form__group.ma-bt-md
-          label.form__label(for='password') Password
-          input#password.form__input(name='password', type='password', placeholder='', required, minlength='6')
-        .form__group
-          button.btn.btn--green Login
+block view
+  .container
+    .row.justify-content-center
+      .col-md-6
+        .card.mx-4
+          .card-body.p-4
+            h1 Register
+            p.text-muted Create your account
+            .input-group.mb-3
+              .input-group-prepend
+                span.input-group-text
+                  svg.c-icon
+                    use(xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user")
+              input.form-control(type='text', placeholder='Username')
+            .input-group.mb-3
+              .input-group-prepend
+                span.input-group-text
+                  svg.c-icon
+                    use(xlink:href="vendors/@coreui/icons/svg/free.svg#cil-envelope-open")
+              input.form-control(type='text', placeholder='Email')
+            .input-group.mb-3
+              .input-group-prepend
+                span.input-group-text
+                  svg.c-icon
+                    use(xlink:href="vendors/@coreui/icons/svg/free.svg#cil-lock-locked")
+              input.form-control(type='password', placeholder='Password')
+            .input-group.mb-4
+              .input-group-prepend
+                span.input-group-text
+                  svg.c-icon
+                    use(xlink:href="vendors/@coreui/icons/svg/free.svg#cil-lock-locked")
+              input.form-control(type='password', placeholder='Repeat password')
+            button.btn.btn-block.btn-success(type='button') Create Account
+          .card-footer.p-4
+            .row
+              .col-6
+                button.btn.btn-block.btn-facebook(type='button')
+                  span facebook
+              .col-6
+                button.btn.btn-block.btn-twitter(type='button')
+                  span twitter
