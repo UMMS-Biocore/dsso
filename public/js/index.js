@@ -1,6 +1,6 @@
 /* eslint-disable */
 import '@babel/polyfill';
-import { logout } from './login';
+import { loadLoginDiv, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { showAlert } from './alerts';
 // require('jquery');
@@ -11,20 +11,22 @@ import { showAlert } from './alerts';
 // require('chart.js');
 
 // DOM ELEMENTS
-// const loginForm = document.querySelector('.form--login');
-const logOutBtn = document.querySelector('.nav__el--logout');
+const loginForm = document.querySelector('#loginOuterDiv');
+// const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
-// if (loginForm)
-//   loginForm.addEventListener('submit', e => {
-//     e.preventDefault();
-//     const email_or_username = document.getElementById('username').value;
-//     const password = document.getElementById('password').value;
-//     login(email_or_username, password);
-//   });
+if (loginForm) {
+  loadLoginDiv('loginDiv');
+}
+// loginForm.addEventListener('submit', e => {
+//   e.preventDefault();
+//   const email_or_username = document.getElementById('username').value;
+//   const password = document.getElementById('password').value;
+//   login(email_or_username, password);
+// });
 
-if (logOutBtn) logOutBtn.addEventListener('click', logout);
+// if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 if (userDataForm)
   userDataForm.addEventListener('submit', e => {

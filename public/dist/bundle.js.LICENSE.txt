@@ -1,100 +1,698 @@
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+/*!
+ * Sizzle CSS Selector Engine v2.3.5
+ * https://sizzlejs.com/
+ *
+ * Copyright JS Foundation and other contributors
+ * Released under the MIT license
+ * https://js.foundation/
+ *
+ * Date: 2020-03-14
+ */
+
+/*!
+ * jQuery JavaScript Library v3.5.1
+ * https://jquery.com/
+ *
+ * Includes Sizzle.js
+ * https://sizzlejs.com/
+ *
+ * Copyright JS Foundation and other contributors
+ * Released under the MIT license
+ * https://jquery.org/license
+ *
+ * Date: 2020-05-04T22:49Z
+ */
+
 /*!   exports [maybe provided (runtime-defined)] [no usage info] */
 
-/*! CommonJS bailout: exports is used directly at 275:0-7 */
+/*! ../../modules/_core */
 
-/*! CommonJS bailout: exports is used directly at 276:0-7 */
+/*! ../../modules/_wks-ext */
 
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
+/*! ../../modules/es6.promise */
 
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/*! ../../modules/es7.array.flat-map */
 
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/*! ../../modules/es7.array.includes */
 
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/*! ../../modules/es7.object.entries */
 
-/*! CommonJS bailout: module.exports is used directly at 13:1-15 */
+/*! ../../modules/es7.object.get-own-property-descriptors */
 
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! ../../modules/es7.object.values */
 
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/*! ../../modules/es7.promise.finally */
 
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
+/*! ../../modules/es7.string.pad-end */
 
-/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/*! ../../modules/es7.string.pad-start */
 
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/*! ../../modules/es7.string.trim-left */
 
-/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
+/*! ../../modules/es7.string.trim-right */
 
-/*! CommonJS bailout: module.exports is used directly at 1:11-25 */
+/*! ../../modules/es7.symbol.async-iterator */
 
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
+/*! ../cancel/isCancel */
 
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/*! ../core/createError */
 
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/*! ../defaults */
 
-/*! CommonJS bailout: module.exports is used directly at 282:0-14 */
+/*! ../modules/_core */
 
-/*! CommonJS bailout: module.exports is used directly at 2:0-14 */
+/*! ../modules/es6.array.copy-within */
 
-/*! CommonJS bailout: module.exports is used directly at 2:13-27 */
+/*! ../modules/es6.array.every */
 
-/*! CommonJS bailout: module.exports is used directly at 30:0-14 */
+/*! ../modules/es6.array.fill */
 
-/*! CommonJS bailout: module.exports is used directly at 31:0-14 */
+/*! ../modules/es6.array.filter */
 
-/*! CommonJS bailout: module.exports is used directly at 325:2-16 */
+/*! ../modules/es6.array.find */
 
-/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
+/*! ../modules/es6.array.find-index */
 
-/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
+/*! ../modules/es6.array.for-each */
 
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/*! ../modules/es6.array.from */
 
-/*! CommonJS bailout: module.exports is used directly at 40:15-29 */
+/*! ../modules/es6.array.index-of */
 
-/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
+/*! ../modules/es6.array.is-array */
 
-/*! CommonJS bailout: module.exports is used directly at 47:11-25 */
+/*! ../modules/es6.array.iterator */
 
-/*! CommonJS bailout: module.exports is used directly at 480:7-21 */
+/*! ../modules/es6.array.join */
 
-/*! CommonJS bailout: module.exports is used directly at 49:0-14 */
+/*! ../modules/es6.array.last-index-of */
 
-/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
+/*! ../modules/es6.array.map */
 
-/*! CommonJS bailout: module.exports is used directly at 52:0-14 */
+/*! ../modules/es6.array.of */
 
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
+/*! ../modules/es6.array.reduce */
 
-/*! CommonJS bailout: module.exports is used directly at 58:0-14 */
+/*! ../modules/es6.array.reduce-right */
 
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
+/*! ../modules/es6.array.slice */
 
-/*! CommonJS bailout: module.exports is used directly at 62:0-14 */
+/*! ../modules/es6.array.some */
 
-/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
+/*! ../modules/es6.array.sort */
 
-/*! CommonJS bailout: module.exports is used directly at 6:1-15 */
+/*! ../modules/es6.array.species */
 
-/*! CommonJS bailout: module.exports is used directly at 6:15-29 */
+/*! ../modules/es6.date.now */
 
-/*! CommonJS bailout: module.exports is used directly at 710:31-45 */
+/*! ../modules/es6.date.to-iso-string */
 
-/*! CommonJS bailout: module.exports is used directly at 79:0-14 */
+/*! ../modules/es6.date.to-json */
 
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
+/*! ../modules/es6.date.to-primitive */
 
-/*! CommonJS bailout: module.exports is used directly at 81:0-14 */
+/*! ../modules/es6.date.to-string */
 
-/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
+/*! ../modules/es6.function.bind */
 
-/*! CommonJS bailout: module.exports is used directly at 96:0-14 */
+/*! ../modules/es6.function.has-instance */
 
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! ../modules/es6.function.name */
 
-/*! CommonJS bailout: module.exports is used directly at 9:14-28 */
+/*! ../modules/es6.map */
+
+/*! ../modules/es6.math.acosh */
+
+/*! ../modules/es6.math.asinh */
+
+/*! ../modules/es6.math.atanh */
+
+/*! ../modules/es6.math.cbrt */
+
+/*! ../modules/es6.math.clz32 */
+
+/*! ../modules/es6.math.cosh */
+
+/*! ../modules/es6.math.expm1 */
+
+/*! ../modules/es6.math.fround */
+
+/*! ../modules/es6.math.hypot */
+
+/*! ../modules/es6.math.imul */
+
+/*! ../modules/es6.math.log10 */
+
+/*! ../modules/es6.math.log1p */
+
+/*! ../modules/es6.math.log2 */
+
+/*! ../modules/es6.math.sign */
+
+/*! ../modules/es6.math.sinh */
+
+/*! ../modules/es6.math.tanh */
+
+/*! ../modules/es6.math.trunc */
+
+/*! ../modules/es6.number.constructor */
+
+/*! ../modules/es6.number.epsilon */
+
+/*! ../modules/es6.number.is-finite */
+
+/*! ../modules/es6.number.is-integer */
+
+/*! ../modules/es6.number.is-nan */
+
+/*! ../modules/es6.number.is-safe-integer */
+
+/*! ../modules/es6.number.max-safe-integer */
+
+/*! ../modules/es6.number.min-safe-integer */
+
+/*! ../modules/es6.number.parse-float */
+
+/*! ../modules/es6.number.parse-int */
+
+/*! ../modules/es6.number.to-fixed */
+
+/*! ../modules/es6.number.to-precision */
+
+/*! ../modules/es6.object.assign */
+
+/*! ../modules/es6.object.create */
+
+/*! ../modules/es6.object.define-properties */
+
+/*! ../modules/es6.object.define-property */
+
+/*! ../modules/es6.object.freeze */
+
+/*! ../modules/es6.object.get-own-property-descriptor */
+
+/*! ../modules/es6.object.get-own-property-names */
+
+/*! ../modules/es6.object.get-prototype-of */
+
+/*! ../modules/es6.object.is */
+
+/*! ../modules/es6.object.is-extensible */
+
+/*! ../modules/es6.object.is-frozen */
+
+/*! ../modules/es6.object.is-sealed */
+
+/*! ../modules/es6.object.keys */
+
+/*! ../modules/es6.object.prevent-extensions */
+
+/*! ../modules/es6.object.seal */
+
+/*! ../modules/es6.object.set-prototype-of */
+
+/*! ../modules/es6.object.to-string */
+
+/*! ../modules/es6.parse-float */
+
+/*! ../modules/es6.parse-int */
+
+/*! ../modules/es6.promise */
+
+/*! ../modules/es6.reflect.apply */
+
+/*! ../modules/es6.reflect.construct */
+
+/*! ../modules/es6.reflect.define-property */
+
+/*! ../modules/es6.reflect.delete-property */
+
+/*! ../modules/es6.reflect.enumerate */
+
+/*! ../modules/es6.reflect.get */
+
+/*! ../modules/es6.reflect.get-own-property-descriptor */
+
+/*! ../modules/es6.reflect.get-prototype-of */
+
+/*! ../modules/es6.reflect.has */
+
+/*! ../modules/es6.reflect.is-extensible */
+
+/*! ../modules/es6.reflect.own-keys */
+
+/*! ../modules/es6.reflect.prevent-extensions */
+
+/*! ../modules/es6.reflect.set */
+
+/*! ../modules/es6.reflect.set-prototype-of */
+
+/*! ../modules/es6.regexp.constructor */
+
+/*! ../modules/es6.regexp.exec */
+
+/*! ../modules/es6.regexp.flags */
+
+/*! ../modules/es6.regexp.match */
+
+/*! ../modules/es6.regexp.replace */
+
+/*! ../modules/es6.regexp.search */
+
+/*! ../modules/es6.regexp.split */
+
+/*! ../modules/es6.regexp.to-string */
+
+/*! ../modules/es6.set */
+
+/*! ../modules/es6.string.anchor */
+
+/*! ../modules/es6.string.big */
+
+/*! ../modules/es6.string.blink */
+
+/*! ../modules/es6.string.bold */
+
+/*! ../modules/es6.string.code-point-at */
+
+/*! ../modules/es6.string.ends-with */
+
+/*! ../modules/es6.string.fixed */
+
+/*! ../modules/es6.string.fontcolor */
+
+/*! ../modules/es6.string.fontsize */
+
+/*! ../modules/es6.string.from-code-point */
+
+/*! ../modules/es6.string.includes */
+
+/*! ../modules/es6.string.italics */
+
+/*! ../modules/es6.string.iterator */
+
+/*! ../modules/es6.string.link */
+
+/*! ../modules/es6.string.raw */
+
+/*! ../modules/es6.string.repeat */
+
+/*! ../modules/es6.string.small */
+
+/*! ../modules/es6.string.starts-with */
+
+/*! ../modules/es6.string.strike */
+
+/*! ../modules/es6.string.sub */
+
+/*! ../modules/es6.string.sup */
+
+/*! ../modules/es6.string.trim */
+
+/*! ../modules/es6.symbol */
+
+/*! ../modules/es6.typed.array-buffer */
+
+/*! ../modules/es6.typed.data-view */
+
+/*! ../modules/es6.typed.float32-array */
+
+/*! ../modules/es6.typed.float64-array */
+
+/*! ../modules/es6.typed.int16-array */
+
+/*! ../modules/es6.typed.int32-array */
+
+/*! ../modules/es6.typed.int8-array */
+
+/*! ../modules/es6.typed.uint16-array */
+
+/*! ../modules/es6.typed.uint32-array */
+
+/*! ../modules/es6.typed.uint8-array */
+
+/*! ../modules/es6.typed.uint8-clamped-array */
+
+/*! ../modules/es6.weak-map */
+
+/*! ../modules/es6.weak-set */
+
+/*! ../modules/es7.global */
+
+/*! ../modules/web.dom.iterable */
+
+/*! ../modules/web.immediate */
+
+/*! ../modules/web.timers */
+
+/*! ../utils */
+
+/*! ./../core/settle */
+
+/*! ./../defaults */
+
+/*! ./../helpers/buildURL */
+
+/*! ./../helpers/combineURLs */
+
+/*! ./../helpers/cookies */
+
+/*! ./../helpers/isAbsoluteURL */
+
+/*! ./../helpers/isURLSameOrigin */
+
+/*! ./../helpers/parseHeaders */
+
+/*! ./../utils */
+
+/*! ./Cancel */
+
+/*! ./InterceptorManager */
+
+/*! ./_a-function */
+
+/*! ./_a-number-value */
+
+/*! ./_add-to-unscopables */
+
+/*! ./_advance-string-index */
+
+/*! ./_an-instance */
+
+/*! ./_an-object */
+
+/*! ./_array-copy-within */
+
+/*! ./_array-fill */
+
+/*! ./_array-includes */
+
+/*! ./_array-methods */
+
+/*! ./_array-reduce */
+
+/*! ./_array-species-constructor */
+
+/*! ./_array-species-create */
+
+/*! ./_bind */
+
+/*! ./_classof */
+
+/*! ./_cof */
+
+/*! ./_collection */
+
+/*! ./_collection-strong */
+
+/*! ./_collection-weak */
+
+/*! ./_core */
+
+/*! ./_create-property */
+
+/*! ./_ctx */
+
+/*! ./_date-to-iso-string */
+
+/*! ./_date-to-primitive */
+
+/*! ./_defined */
+
+/*! ./_descriptors */
+
+/*! ./_dom-create */
+
+/*! ./_enum-bug-keys */
+
+/*! ./_enum-keys */
+
+/*! ./_export */
+
+/*! ./_fails */
+
+/*! ./_fails-is-regexp */
+
+/*! ./_fix-re-wks */
+
+/*! ./_flags */
+
+/*! ./_flatten-into-array */
+
+/*! ./_for-of */
+
+/*! ./_function-to-string */
+
+/*! ./_global */
+
+/*! ./_has */
+
+/*! ./_hide */
+
+/*! ./_html */
+
+/*! ./_ie8-dom-define */
+
+/*! ./_inherit-if-required */
+
+/*! ./_invoke */
+
+/*! ./_iobject */
+
+/*! ./_is-array */
+
+/*! ./_is-array-iter */
+
+/*! ./_is-integer */
+
+/*! ./_is-object */
+
+/*! ./_is-regexp */
+
+/*! ./_iter-call */
+
+/*! ./_iter-create */
+
+/*! ./_iter-define */
+
+/*! ./_iter-detect */
+
+/*! ./_iter-step */
+
+/*! ./_iterators */
+
+/*! ./_library */
+
+/*! ./_math-expm1 */
+
+/*! ./_math-fround */
+
+/*! ./_math-log1p */
+
+/*! ./_math-sign */
+
+/*! ./_meta */
+
+/*! ./_microtask */
+
+/*! ./_new-promise-capability */
+
+/*! ./_object-assign */
+
+/*! ./_object-create */
+
+/*! ./_object-dp */
+
+/*! ./_object-dps */
+
+/*! ./_object-gopd */
+
+/*! ./_object-gopn */
+
+/*! ./_object-gopn-ext */
+
+/*! ./_object-gops */
+
+/*! ./_object-gpo */
+
+/*! ./_object-keys */
+
+/*! ./_object-keys-internal */
+
+/*! ./_object-pie */
+
+/*! ./_object-sap */
+
+/*! ./_object-to-array */
+
+/*! ./_own-keys */
+
+/*! ./_parse-float */
+
+/*! ./_parse-int */
+
+/*! ./_perform */
+
+/*! ./_promise-resolve */
+
+/*! ./_property-desc */
+
+/*! ./_redefine */
+
+/*! ./_redefine-all */
+
+/*! ./_regexp-exec */
+
+/*! ./_regexp-exec-abstract */
+
+/*! ./_same-value */
+
+/*! ./_set-proto */
+
+/*! ./_set-species */
+
+/*! ./_set-to-string-tag */
+
+/*! ./_shared */
+
+/*! ./_shared-key */
+
+/*! ./_species-constructor */
+
+/*! ./_strict-method */
+
+/*! ./_string-at */
+
+/*! ./_string-context */
+
+/*! ./_string-html */
+
+/*! ./_string-pad */
+
+/*! ./_string-repeat */
+
+/*! ./_string-trim */
+
+/*! ./_string-ws */
+
+/*! ./_task */
+
+/*! ./_to-absolute-index */
+
+/*! ./_to-index */
+
+/*! ./_to-integer */
+
+/*! ./_to-iobject */
+
+/*! ./_to-length */
+
+/*! ./_to-object */
+
+/*! ./_to-primitive */
+
+/*! ./_typed */
+
+/*! ./_typed-array */
+
+/*! ./_typed-buffer */
+
+/*! ./_uid */
+
+/*! ./_user-agent */
+
+/*! ./_validate-collection */
+
+/*! ./_wks */
+
+/*! ./_wks-define */
+
+/*! ./_wks-ext */
+
+/*! ./adapters/xhr */
+
+/*! ./alerts */
+
+/*! ./cancel/Cancel */
+
+/*! ./cancel/CancelToken */
+
+/*! ./cancel/isCancel */
+
+/*! ./core.get-iterator-method */
+
+/*! ./core/Axios */
+
+/*! ./createError */
+
+/*! ./defaults */
+
+/*! ./dispatchRequest */
+
+/*! ./enhanceError */
+
+/*! ./es6.array.iterator */
+
+/*! ./es6.regexp.exec */
+
+/*! ./es6.regexp.flags */
+
+/*! ./helpers/bind */
+
+/*! ./helpers/normalizeHeaderName */
+
+/*! ./helpers/spread */
+
+/*! ./lib/axios */
+
+/*! ./login */
+
+/*! ./noConflict */
+
+/*! ./transformData */
+
+/*! ./updateSettings */
+
+/*! ./utils */
+
+/*! @babel/polyfill */
+
+/*! axios */
+
+/*! core-js/es6 */
+
+/*! core-js/fn/array/flat-map */
+
+/*! core-js/fn/array/includes */
+
+/*! core-js/fn/object/entries */
+
+/*! core-js/fn/object/get-own-property-descriptors */
+
+/*! core-js/fn/object/values */
+
+/*! core-js/fn/promise/finally */
+
+/*! core-js/fn/string/pad-end */
+
+/*! core-js/fn/string/pad-start */
+
+/*! core-js/fn/string/trim-end */
+
+/*! core-js/fn/string/trim-start */
+
+/*! core-js/fn/symbol/async-iterator */
+
+/*! core-js/library/fn/global */
+
+/*! core-js/web */
 
 /*! default exports */
 
@@ -108,6 +706,8 @@
 
 /*! export hideAlert [provided] [no usage info] [missing usage info prevents renaming] */
 
+/*! export loadLoginDiv [provided] [no usage info] [missing usage info prevents renaming] */
+
 /*! export logout [provided] [no usage info] [missing usage info prevents renaming] */
 
 /*! export showAlert [provided] [no usage info] [missing usage info prevents renaming] */
@@ -120,11 +720,17 @@
 
 /*! exports [not provided] [no usage info] */
 
+/*! is-buffer */
+
+/*! jquery */
+
 /*! namespace exports */
 
 /*! other exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/axios/lib/axios.js */
 
 /*! other exports [not provided] [no usage info] */
+
+/*! regenerator-runtime/runtime */
 
 /*! runtime requirements: __webpack_exports__ */
 
@@ -145,6 +751,8 @@
 /*! runtime requirements: module */
 
 /*! runtime requirements: module, __webpack_require__ */
+
+/*! runtime requirements: module, top-level-this-exports, __webpack_exports__ */
 
 /*! unknown exports (runtime-defined) */
 
@@ -178,6 +786,10 @@
 
 /*!********************************************!*\
   !*** ./node_modules/axios/lib/defaults.js ***!
+  \********************************************/
+
+/*!********************************************!*\
+  !*** ./node_modules/jquery/dist/jquery.js ***!
   \********************************************/
 
 /*!**********************************************!*\

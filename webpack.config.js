@@ -15,6 +15,7 @@ module.exports = {
     ignored: ['node_modules/**']
   },
   mode: 'development',
+  devtool: 'source-map', //Webpack default uses eval and throws `unsafe-eval` error
   module: {
     // how to import files
     rules: [
