@@ -55,47 +55,64 @@ export const loadLoginDiv = divID => {
    <div class="footer">
        <button type="submit" name="login" class="btn btn-info" style="float:right;">Login</button>
    </div>
-</form>
-     <form action="http://localhost:8080/dolphinnext/" method="post">      
-      <div class="text-center" style="margin-top:30%;">Don't have an account <button type="submit" name="signup" class="btn btn-light" style="margin-left:10px;">Sign Up</button></div>                </form>
+  </form>
+  <div class="text-center" style="margin-top:30%;">Don't have an account <button type="submit" name="signup" id="signupBtn" class="btn btn-light" style="margin-left:10px;">Sign Up</button>
+  </div>
 </div>`;
 
-  loginDivs.registerDiv = `
-<div class="card-body p-4">
-  <h1>Register</h1>
-  <p class="text-muted">Create your account</p>
-  <div class="input-group mb-3">
-    <div class="input-group-prepend">
-      <span class="input-group-text">
-        <svg class="c-icon"><use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-user"></use></svg>
-      </span>
-    </div>
-    <input class="form-control" type="text" placeholder="Username">
+  loginDivs.registerDiv = `<div class="body bg-white" style=" border-radius:5px; padding:30px;"
+  <form>
+  <div class="body bg-white" style=" border-radius:5px;">
+      <div style="margin:auto; height:80px; padding-top:20px;">
+        <h2 class="text-center">Sign Up</h2>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="text" name="firstname" class="form-control" placeholder="First name" maxlength="25" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="text" name="lastname" class="form-control" placeholder="Last name" maxlength="20" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="text" name="username" class="form-control" placeholder="Username" maxlength="45" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="text" name="email" class="form-control" maxlength="45" placeholder="Email" value="">
+        </div>                
+      </div>                
+      <div class="text-center form-group">
+        <div>
+          <input type="text" maxlength="45" name="institute" class="form-control" placeholder="Institute" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="text" name="lab" class="form-control" placeholder="Lab/Department" maxlength="45" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="password" name="password" class="form-control password" placeholder="Password" value="">
+        </div>
+      </div>
+      <div class="text-center form-group">
+        <div>
+          <input type="password" name="verifypassword" class="form-control password" placeholder="Verify Password" value="">
+        </div>
+      </div>
+      <div class="text-center form-group" style="margin-top:10%;">
+          <button id="registerBtn" type="submit" name="request" class="btn btn-info btn-block">Submit Request</button>
+          <button id="registerBackBtn" type="submit" name="ok" class="btn btn-light btn-block">Back</button>
+      </div>
   </div>
-  <div class="input-group mb-3">
-    <div class="input-group-prepend">
-      <span class="input-group-text">
-        <svg class="c-icon"><use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-envelope-open"></use></svg>
-      </span>
-    </div>
-    <input class="form-control" type="text" placeholder="Email">
-  </div>
-  <div class="input-group mb-3">
-    <div class="input-group-prepend">
-      <span class="input-group-text">
-        <svg class="c-icon"><use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-lock-locked"></use></svg>
-      </span>
-    </div>
-    <input class="form-control" type="password" placeholder="Password">
-  </div>
-  <div class="input-group mb-4">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><svg class="c-icon"><use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-lock-locked"></use></svg></span>
-    </div>
-    <input class="form-control" type="password" placeholder="Repeat password">
-  </div>
-  <button class="btn btn-block btn-success" type="button">Create Account</button>
-  </div>`;
+</form>
+</div>`;
 
   if (loginDivs[divID]) {
     $('#loginOuterDiv').html(loginDivs[divID]);

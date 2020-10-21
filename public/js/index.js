@@ -3,7 +3,9 @@ import '@babel/polyfill';
 import { loadLoginDiv, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { showAlert } from './alerts';
-// require('jquery');
+suimport { createFormObj } from './funcs';
+
+const $ = require('jquery');
 // require('popper.js');
 // require('pace');
 // require('perfect-scrollbar');
@@ -12,13 +14,69 @@ import { showAlert } from './alerts';
 
 // DOM ELEMENTS
 const loginForm = document.querySelector('#loginOuterDiv');
-// const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
 if (loginForm) {
   loadLoginDiv('loginDiv');
+  $('#loginOuterDiv').on('click', '#signupBtn', function(e) {
+    e.preventDefault();
+    loadLoginDiv('registerDiv');
+  });
+  $('#loginOuterDiv').on('click', '#registerBackBtn', function(e) {
+    e.preventDefault();
+    loadLoginDiv('loginDiv');
+  });
+  $('#loginOuterDiv').on('click', '#registerBtn', async function(e) {
+    e.preventDefault();
+    var formValues = $('#loginOuterDiv').find('input');
+    var requiredFields = [
+      'firstname',
+      'lastname',
+      'username',
+      'email',
+      'institute',
+      'lab',
+      'password',
+      'verifypassword'
+    ];
+    const [formObj, stop] = createFormObj(formValues, requiredFields, true);
+    console.log(formObj);
+    console.log(stop);
+    if (stop === false) {
+      formObj.p = 'saveUserManual';
+    }
+    // try {
+    //   const res = await axios({
+    //     method: 'POST',
+    //     url: '/login',
+    //     data: {
+    //       username: email_or_username,
+    //       password
+    //     }
+    //   });
+
+    //   if (res.data.status === 'success') {
+    //   }
+    // } catch (err) {
+    //   showAlert('error', err.response.data.message);
+    // }
+
+    // $.ajax({
+    //   type: 'POST',
+    //   url: 'ajax/ajaxquery.php',
+    //   data: formObj,
+    //   async: true,
+    //   success: function(s) {
+    //     console.log(s);
+    //   },
+    //   error: function(errorThrown) {
+    //     alert('Error: ' + errorThrown);
+    //   }
+    // });
+  });
 }
+
 // loginForm.addEventListener('submit', e => {
 //   e.preventDefault();
 //   const email_or_username = document.getElementById('username').value;
