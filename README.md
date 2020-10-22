@@ -1,4 +1,4 @@
-# Dlogin Server - Authorization server
+# DSSO Server - Authorization server
 
 ## Initial Setup:
 

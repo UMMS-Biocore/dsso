@@ -14,6 +14,12 @@
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "prefer-destructuring": ["error", { "object": false, "array": false }],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }],
+    "no-plusplus": "off",
+    "eqeqeq": "off",
+    "dot-notation": "off",
+    "prefer-const": "off",
+    "no-restricted-syntax": "off",
+    "camelcase": "off"
   }
 }

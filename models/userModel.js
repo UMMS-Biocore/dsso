@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const beautifyUnique = require('mongoose-beautiful-unique-validation');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -11,14 +12,14 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please provide your email'],
-    unique: true,
+    unique: 'The email ({VALUE}) already exists. Please use a different email.',
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
   username: {
     type: String,
     required: [true, 'Please provide your username'],
-    unique: true,
+    unique: 'The username ({VALUE}) already in use. Please use a different username.',
     lowercase: true
   },
   photo: {
@@ -29,6 +30,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'developer', 'admin'],
     default: 'user'
+  },
+  loginType: {
+    type: String,
+    enum: ['password', 'google', 'ldap'],
+    default: 'password'
   },
   scope: {
     type: String
@@ -50,12 +56,20 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!'
     }
   },
+  emailConfirm: {
+    type: String,
+    select: false
+  },
+  adminConfirm: {
+    type: String,
+    select: false
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
   active: {
     type: Boolean,
-    default: true,
+    default: false,
     select: false
   },
   updated: {
@@ -66,6 +80,9 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// proper warning message when field is not entered as unique
+userSchema.plugin(beautifyUnique);
 
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
@@ -115,11 +132,31 @@ userSchema.methods.createPasswordResetToken = function() {
     .update(resetToken)
     .digest('hex');
 
-  // console.log({ resetToken }, this.passwordResetToken);
-
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
+};
+
+userSchema.methods.createEmailValidationToken = function() {
+  const emailToken = crypto.randomBytes(32).toString('hex');
+
+  this.emailConfirm = crypto
+    .createHash('sha256')
+    .update(emailToken)
+    .digest('hex');
+
+  return emailToken;
+};
+
+userSchema.methods.createAdminValidationToken = function() {
+  const adminToken = crypto.randomBytes(32).toString('hex');
+
+  this.adminConfirm = crypto
+    .createHash('sha256')
+    .update(adminToken)
+    .digest('hex');
+
+  return adminToken;
 };
 
 const User = mongoose.model('User', userSchema);

@@ -4,11 +4,6 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const options = {
-  key: fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'))
-};
-
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   console.log(err.name, err.message);
@@ -17,6 +12,13 @@ process.on('uncaughtException', err => {
 
 dotenv.config({ path: './config.env' });
 const app = require('./app');
+
+app.locals.env = process.env;
+
+const options = {
+  key: fs.readFileSync(path.join(__dirname, process.env.CERTS_PRIVATE_KEY)),
+  cert: fs.readFileSync(path.join(__dirname, process.env.CERTS_CERTIFICATE))
+};
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 

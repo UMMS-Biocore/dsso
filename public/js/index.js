@@ -1,33 +1,79 @@
 /* eslint-disable */
 import '@babel/polyfill';
-import { displayMap } from './mapbox';
-import { logout } from './login';
+import { loadLoginDiv, logout } from './login';
 import { updateSettings } from './updateSettings';
-import { showAlert } from './alerts';
+import { createFormObj, showFormError } from './funcs';
+import axios from 'axios';
+
+const $ = require('jquery');
+// require('popper.js');
+// require('pace');
+// require('perfect-scrollbar');
+// require('@coreui/coreui');
+// require('chart.js');
 
 // DOM ELEMENTS
-const mapBox = document.getElementById('map');
-// const loginForm = document.querySelector('.form--login');
-const logOutBtn = document.querySelector('.nav__el--logout');
+const loginForm = document.querySelector('#loginOuterDiv');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
-const bookBtn = document.getElementById('book-tour');
 
-// DELEGATION
-if (mapBox) {
-  const locations = JSON.parse(mapBox.dataset.locations);
-  displayMap(locations);
+if (loginForm) {
+  loadLoginDiv('loginDiv');
+  $('#loginOuterDiv').on('click', '#signupBtn', function(e) {
+    e.preventDefault();
+    loadLoginDiv('registerDiv');
+  });
+  $('#loginOuterDiv').on('click', '.signInBackBtn', function(e) {
+    e.preventDefault();
+    loadLoginDiv('loginDiv');
+  });
+  $('#loginOuterDiv').on('click', '#registerBtn', async function(e) {
+    e.preventDefault();
+    var formValues = $('#loginOuterDiv').find('input');
+    var requiredFields = [
+      'firstname',
+      'lastname',
+      'username',
+      'email',
+      'institute',
+      'lab',
+      'password',
+      'passwordConfirm'
+    ];
+    const [formObj, stop] = createFormObj(formValues, requiredFields, true);
+    console.log(formObj);
+    console.log(stop);
+    if (stop === false) {
+      try {
+        const res = await axios({
+          method: 'POST',
+          url: '/api/v1/users/signup',
+          data: formObj
+        });
+
+        if (res && res.data && res.data.status === 'success') {
+          console.log('success');
+          loadLoginDiv('successSignUpDiv');
+        }
+      } catch (e) {
+        console.log(e.response);
+        if (e.response && e.response.data && e.response.data.error) {
+          const errors = e.response.data.error.errors;
+          showFormError(formValues, errors, true);
+        }
+      }
+    }
+  });
 }
 
-// if (loginForm)
-//   loginForm.addEventListener('submit', e => {
-//     e.preventDefault();
-//     const email_or_username = document.getElementById('username').value;
-//     const password = document.getElementById('password').value;
-//     login(email_or_username, password);
-//   });
+// loginForm.addEventListener('submit', e => {
+//   e.preventDefault();
+//   const email_or_username = document.getElementById('username').value;
+//   const password = document.getElementById('password').value;
+//   login(email_or_username, password);
+// });
 
-if (logOutBtn) logOutBtn.addEventListener('click', logout);
+// if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 if (userDataForm)
   userDataForm.addEventListener('submit', e => {
@@ -55,12 +101,3 @@ if (userPasswordForm)
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
   });
-
-if (bookBtn)
-  bookBtn.addEventListener('click', e => {
-    e.target.textContent = 'Processing...';
-    const { tourId } = e.target.dataset;
-  });
-
-const alertMessage = document.querySelector('body').dataset.alert;
-if (alertMessage) showAlert('success', alertMessage, 20);
