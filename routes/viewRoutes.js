@@ -9,7 +9,7 @@ router.get('/', authController.isLoggedIn, viewsController.getOverview);
 router.get('/login', viewsController.getLoginForm);
 router.post('/login', authController.login);
 router.get('/account', authController.protect, viewsController.getAccount);
-router.get('/verifyEmail/:token', authController.verifyEmail, viewsController.verifyEmail);
+router.get('/verifyEmail', authController.verifyEmail, viewsController.verifyEmail);
 
 router.get('/dialog/authorize', oauth2.authorization);
 router.get('/dialog/check', oauth2.check_authorization);

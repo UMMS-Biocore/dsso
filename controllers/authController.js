@@ -53,7 +53,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const validationToken = newUser.createEmailValidationToken();
   await newUser.save({ validateBeforeSave: false });
 
-  const confirmUrl = `${req.protocol}://${req.get('host')}/verifyEmail/${validationToken}`;
+  const confirmUrl = `${req.protocol}://${req.get('host')}/verifyEmail?token=${validationToken}`;
 
   await new Email(newUser, confirmUrl).sendConfirmMessage();
 
@@ -156,7 +156,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
   const hashedToken = crypto
     .createHash('sha256')
-    .update(req.params.token)
+    .update(req.query.token)
     .digest('hex');
   console.log(hashedToken);
 
@@ -170,12 +170,22 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
     return next(new AppError('Token is invalid.', 400));
   }
   // User.updateOne skips pre hooks to update inactive user
-  // await User.updateOne(
-  //   { _id: user._id },
-  //   {
-  //     emailConfirm: undefined
-  //   }
-  // );
+  await User.updateOne(
+    { _id: user._id },
+    {
+      emailConfirm: undefined,
+      active: true
+    }
+  );
+
+  // 3) Generate the random email validation token
+  // const adminToken = newUser.createAdminValidationToken();
+  // await newUser.save({ validateBeforeSave: false });
+
+  // const confirmUrl = `${req.protocol}://${req.get('host')}/verifyAccount?token=${adminToken}`;
+
+  // await new Email(newUser, confirmUrl).sendAdminConfirm();
+
   res.locals.emailConfirm = true;
   next();
 });

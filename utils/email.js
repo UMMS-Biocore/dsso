@@ -52,6 +52,10 @@ module.exports = class Email {
     await this.send('confirmLink', `Welcome to ${process.env.COMPANY_NAME}! Confirm Your Email`);
   }
 
+  async sendAdminConfirm() {
+    await this.send('adminConfirm', `Your account has been activated.`);
+  }
+
   async sendPasswordReset() {
     await this.send('passwordReset', 'Your password reset token (valid for only 10 minutes)');
   }

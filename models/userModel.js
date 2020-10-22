@@ -148,6 +148,17 @@ userSchema.methods.createEmailValidationToken = function() {
   return emailToken;
 };
 
+userSchema.methods.createAdminValidationToken = function() {
+  const adminToken = crypto.randomBytes(32).toString('hex');
+
+  this.adminConfirm = crypto
+    .createHash('sha256')
+    .update(adminToken)
+    .digest('hex');
+
+  return adminToken;
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
