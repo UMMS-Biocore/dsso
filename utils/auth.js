@@ -3,10 +3,68 @@ const { Strategy: LocalStrategy } = require('passport-local');
 const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const { Strategy: BearerStrategy } = require('passport-http-bearer');
+// const LdapStrategy = require('passport-ldapauth').Strategy;
+// const ldap = require('ldapjs');
+var ActiveDirectory = require('activedirectory');
+
 const validate = require('./validate');
 const accessTokens = require('./../controllers/accessTokenController');
 const User = require('./../models/userModel');
 const Client = require('./../models/clientModel');
+
+/**
+ * LdapStrategy
+ */
+
+const useLdapStrategy = async (usernameoremail, password) => {
+  console.log('LdapStrategy');
+  try {
+    if (!process.env.LDAP_SERVER || process.env.LDAP_SERVER == 'NA') return false;
+    var config = {
+      url: `ldap://${process.env.LDAP_SERVER}`,
+      baseDN: process.env.DN_STRING,
+      username: process.env.BIND_USER,
+      password: process.env.BIND_PASS
+    };
+    var ad = new ActiveDirectory(config);
+
+    let myPromise = new Promise((resolve, reject) => {
+      ad.findUser(usernameoremail, async function(err, user) {
+        if (err) {
+          const fail_found = 'ERROR: ' + JSON.stringify(err);
+          reject(fail_found);
+        }
+        if (user && user.dn) {
+          ad.authenticate(user.dn, password, function(err, auth) {
+            if (err) {
+              const fail_found = 'ERROR: ' + JSON.stringify(err);
+              reject(fail_found);
+            }
+            if (auth) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          });
+        } else {
+          reject(false);
+        }
+      });
+    });
+
+    return myPromise
+      .then(succ => {
+        return succ;
+      })
+      .catch(err => {
+        console.log(err);
+        return false;
+      });
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
 
 /**
  * LocalStrategy
@@ -19,6 +77,7 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     console.log('LocalStrategy');
     try {
+      let ldapAuth = false;
       let data = {};
       if (username.match(/@/)) {
         data.email = username;
@@ -26,10 +85,13 @@ passport.use(
         data.username = username;
       }
       const user = await User.findOne(data).select('+password');
-      if (!user || !(await user.correctPassword(password, user.password))) {
-        return done(null, false);
-      }
-      done(null, user);
+      if (!user) return done(null, false);
+      const passCheck = await user.correctPassword(password, user.password);
+      if (passCheck) return done(null, user);
+      // if passCheck is not verified, then check with ldap
+      ldapAuth = await useLdapStrategy(username, password);
+      if (ldapAuth) return done(null, user);
+      return done(null, false);
     } catch {
       done(null, false);
     }
