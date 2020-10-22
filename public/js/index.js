@@ -2,8 +2,8 @@
 import '@babel/polyfill';
 import { loadLoginDiv, logout } from './login';
 import { updateSettings } from './updateSettings';
-import { showAlert } from './alerts';
-suimport { createFormObj } from './funcs';
+import { createFormObj, showFormError } from './funcs';
+import axios from 'axios';
 
 const $ = require('jquery');
 // require('popper.js');
@@ -23,7 +23,7 @@ if (loginForm) {
     e.preventDefault();
     loadLoginDiv('registerDiv');
   });
-  $('#loginOuterDiv').on('click', '#registerBackBtn', function(e) {
+  $('#loginOuterDiv').on('click', '.signInBackBtn', function(e) {
     e.preventDefault();
     loadLoginDiv('loginDiv');
   });
@@ -38,42 +38,31 @@ if (loginForm) {
       'institute',
       'lab',
       'password',
-      'verifypassword'
+      'passwordConfirm'
     ];
     const [formObj, stop] = createFormObj(formValues, requiredFields, true);
     console.log(formObj);
     console.log(stop);
     if (stop === false) {
-      formObj.p = 'saveUserManual';
+      try {
+        const res = await axios({
+          method: 'POST',
+          url: '/api/v1/users/signup',
+          data: formObj
+        });
+
+        if (res && res.data && res.data.status === 'success') {
+          console.log('success');
+          loadLoginDiv('successSignUpDiv');
+        }
+      } catch (e) {
+        console.log(e.response);
+        if (e.response && e.response.data && e.response.data.error) {
+          const errors = e.response.data.error.errors;
+          showFormError(formValues, errors, true);
+        }
+      }
     }
-    // try {
-    //   const res = await axios({
-    //     method: 'POST',
-    //     url: '/login',
-    //     data: {
-    //       username: email_or_username,
-    //       password
-    //     }
-    //   });
-
-    //   if (res.data.status === 'success') {
-    //   }
-    // } catch (err) {
-    //   showAlert('error', err.response.data.message);
-    // }
-
-    // $.ajax({
-    //   type: 'POST',
-    //   url: 'ajax/ajaxquery.php',
-    //   data: formObj,
-    //   async: true,
-    //   success: function(s) {
-    //     console.log(s);
-    //   },
-    //   error: function(errorThrown) {
-    //     alert('Error: ' + errorThrown);
-    //   }
-    // });
   });
 }
 
@@ -112,6 +101,3 @@ if (userPasswordForm)
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
   });
-
-const alertMessage = document.querySelector('body').dataset.alert;
-if (alertMessage) showAlert('success', alertMessage, 20);

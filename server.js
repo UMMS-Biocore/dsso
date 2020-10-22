@@ -13,6 +13,8 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
+app.locals.env = process.env;
+
 const options = {
   key: fs.readFileSync(path.join(__dirname, process.env.CERTS_PRIVATE_KEY)),
   cert: fs.readFileSync(path.join(__dirname, process.env.CERTS_CERTIFICATE))

@@ -47,3 +47,26 @@ export const createFormObj = (formValues, requiredFields, warn) => {
   }
   return [formObj, stop];
 };
+
+export const showFormError = (formValues, errorFields, warn) => {
+  console.log(errorFields);
+  if (errorFields) {
+    for (var i = 0; i < formValues.length; i++) {
+      var name = $(formValues[i]).attr('name');
+      if (name in errorFields) {
+        $(formValues[i]).addClass('is-invalid');
+        if (errorFields[name]['message'] && warn) {
+          const errorText = errorFields[name]['message'];
+          if ($(formValues[i]).next('div.invalid-feedback').length == 0) {
+            $(formValues[i]).after(`<div class="invalid-feedback text-left">${errorText}</div>`);
+          } else {
+            $(formValues[i])
+              .next('div.invalid-feedback')
+              .remove()
+              .after(`<div class="invalid-feedback text-left">${errorText}</div>`);
+          }
+        }
+      }
+    }
+  }
+};
