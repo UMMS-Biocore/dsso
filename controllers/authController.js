@@ -55,7 +55,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const validationToken = newUser.createEmailValidationToken();
   await newUser.save({ validateBeforeSave: false });
 
-  const confirmUrl = `${req.protocol}://${req.get('host')}/verifyEmail?token=${validationToken}`;
+  const confirmUrl = `${process.env.BASE_URL}/verifyEmail?token=${validationToken}`;
 
   await new Email(newUser, confirmUrl).sendConfirmMessage();
 
@@ -80,7 +80,8 @@ exports.googleLoginCallback = [
     // Successful authentication, redirect success.
     // retrieve params from req.session.returnTo
     if (req.session.returnTo) {
-      var queryData = url.parse(req.session.returnTo, true).query;
+      // eslint-disable-next-line node/no-deprecated-api
+      const queryData = url.parse(req.session.returnTo, true).query;
       req.query = {
         redirect_uri: queryData.redirect_uri,
         response_type: queryData.response_type,
