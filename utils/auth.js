@@ -3,9 +3,8 @@ const { Strategy: LocalStrategy } = require('passport-local');
 const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const { Strategy: BearerStrategy } = require('passport-http-bearer');
-// const LdapStrategy = require('passport-ldapauth').Strategy;
-// const ldap = require('ldapjs');
-var ActiveDirectory = require('activedirectory');
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const ActiveDirectory = require('activedirectory'); // LDAP
 
 const validate = require('./validate');
 const accessTokens = require('./../controllers/accessTokenController');
@@ -96,6 +95,25 @@ passport.use(
       done(null, false);
     }
   })
+);
+
+/*  Google AUTH  */
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL
+    },
+    async function(accessToken, refreshToken, profile, done) {
+      let user = null;
+      if (profile && profile._json && profile._json.email) {
+        user = await User.findOne({ email: profile._json.email });
+      }
+      return done(null, user);
+    }
+  )
 );
 
 /**
@@ -193,7 +211,7 @@ passport.use(
 // the client by ID from the database.
 
 passport.serializeUser((user, done) => {
-  console.log('serializeUser', user);
+  console.log('serializeUser');
   done(null, user._id);
 });
 

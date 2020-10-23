@@ -202,8 +202,8 @@ server.exchange(
  */
 const checkLoggedIn = () => {
   return function(req, res, next) {
-    console.log(req.user);
-    console.log(req.query);
+    console.log('checkLoggedIn');
+    console.log(req.session);
     const redirectOriginal = req.query.redirect_original;
     if (req.user) {
       //user signed in
@@ -266,6 +266,7 @@ exports.authorization = [
   login.ensureLoggedIn(),
   server.authorization(async (clientID, redirectURI, scope, done) => {
     console.log('server.authorization');
+
     try {
       const client = await clients.findByClientId(clientID);
       if (client) {
@@ -280,6 +281,8 @@ exports.authorization = [
   }),
   async (req, res, next) => {
     console.log('render dialog');
+    console.log('2req.query', req.query);
+
     // Render the decision dialog if the client isn't a trusted client
     // TODO:  Make a mechanism so that if this isn't a trusted client, the user can record that
     // they have consented but also make a mechanism so that if the user revokes access to any of

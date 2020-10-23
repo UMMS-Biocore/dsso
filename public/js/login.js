@@ -22,7 +22,9 @@ export const loadLoginDiv = divID => {
    <div style="margin:auto; height:80px; padding-top:20px;">
        <h2 class="text-center">Log In</h2>
    </div>
-   <div style="margin:auto; width:50%;  height:100px; padding-top:20px;">Signed in with Google</div>                    
+   <div style="margin:auto; width:50%;  height:100px; padding-top:20px; padding-left:30px;">
+    <a href="/auth/google" class="btn btn-info"><i class="fa fa-pencil" aria-hidden="true"></i> Sign In with Google</a>
+   </div>                    
    <div class="form-group" style="margin-top:20px;">
        <input name="username" class="form-control" placeholder="E-mail/Username" required>
    </div>
@@ -75,12 +77,12 @@ export const loadLoginDiv = divID => {
       </div>
       <div class="text-center form-group">
         <div>
-          <input type="password" name="password" class="form-control password" placeholder="Password" minlength='8' required>
+          <input type="password" name="password" class="form-control password" placeholder="Password" required>
         </div>
       </div>
       <div class="text-center form-group">
         <div>
-          <input type="password" name="passwordConfirm" class="form-control password" placeholder="Verify Password" minlength='8' required>
+          <input type="password" name="passwordConfirm" class="form-control password" placeholder="Verify Password"  required>
         </div>
       </div>
       <div class="text-center form-group" style="margin-top:10%;">
