@@ -111,15 +111,6 @@ passport.use(
       if (profile && profile._json && profile._json.email) {
         user = await User.findOne({ email: profile._json.email });
       }
-      console.log(user);
-
-      if (!user) {
-        // user might be inactive or not exists
-        console.log('no user');
-        // user.logintype = 'google';
-        // await user.save({ validateBeforeSave: false });
-      }
-
       return done(null, user);
     }
   )
