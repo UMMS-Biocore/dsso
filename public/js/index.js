@@ -1,7 +1,6 @@
 /* eslint-disable */
 import '@babel/polyfill';
 import { loadLoginDiv, logout } from './login';
-import { updateSettings } from './updateSettings';
 import { createFormObj, showFormError } from './funcs';
 import axios from 'axios';
 
@@ -74,30 +73,3 @@ if (loginForm) {
 // });
 
 // if (logOutBtn) logOutBtn.addEventListener('click', logout);
-
-if (userDataForm)
-  userDataForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const form = new FormData();
-    form.append('name', document.getElementById('name').value);
-    form.append('email', document.getElementById('email').value);
-    form.append('photo', document.getElementById('photo').files[0]);
-
-    updateSettings(form, 'data');
-  });
-
-if (userPasswordForm)
-  userPasswordForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    document.querySelector('.btn--save-password').textContent = 'Updating...';
-
-    const passwordCurrent = document.getElementById('password-current').value;
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('password-confirm').value;
-    await updateSettings({ passwordCurrent, password, passwordConfirm }, 'password');
-
-    document.querySelector('.btn--save-password').textContent = 'Save password';
-    document.getElementById('password-current').value = '';
-    document.getElementById('password').value = '';
-    document.getElementById('password-confirm').value = '';
-  });

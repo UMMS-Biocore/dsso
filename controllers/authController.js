@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const passport = require('passport');
+const url = require('url');
 // const request = require('request');
 // const { get, post } = require('request');
 const { promisify } = require('util');
@@ -8,6 +9,7 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Email = require('./../utils/email');
+const oauth2 = require('./../utils/oauth2');
 
 // const [getAsync, postAsync] = [get, post].map(promisify);
 
@@ -68,6 +70,29 @@ exports.login = [
     successReturnToOrRedirect: '/',
     failureRedirect: '/login'
   })
+];
+
+exports.googleLogin = [passport.authenticate('google', { scope: ['profile', 'email'] })];
+
+exports.googleLoginCallback = [
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res, next) {
+    // Successful authentication, redirect success.
+    // retrieve params from req.session.returnTo
+    if (req.session.returnTo) {
+      var queryData = url.parse(req.session.returnTo, true).query;
+      req.query = {
+        redirect_uri: queryData.redirect_uri,
+        response_type: queryData.response_type,
+        client_id: queryData.client_id,
+        scope: queryData.scope
+      };
+      next();
+    } else {
+      res.redirect('/');
+    }
+  },
+  oauth2.check_authorization
 ];
 
 /**
