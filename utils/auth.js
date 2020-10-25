@@ -15,28 +15,28 @@ const Client = require('./../models/clientModel');
  * LdapStrategy
  */
 
-const useLdapStrategy = async (usernameoremail, password) => {
+exports.useLdapStrategy = async (usernameoremail, password) => {
   console.log('LdapStrategy');
   try {
     if (!process.env.LDAP_SERVER || process.env.LDAP_SERVER == 'NA') return false;
-    var config = {
+    const config = {
       url: `ldap://${process.env.LDAP_SERVER}`,
       baseDN: process.env.DN_STRING,
       username: process.env.BIND_USER,
       password: process.env.BIND_PASS
     };
-    var ad = new ActiveDirectory(config);
+    const ad = new ActiveDirectory(config);
 
     let myPromise = new Promise((resolve, reject) => {
       ad.findUser(usernameoremail, async function(err, user) {
         if (err) {
-          const fail_found = 'ERROR: ' + JSON.stringify(err);
+          const fail_found = `ERROR: ${JSON.stringify(err)}`;
           reject(fail_found);
         }
         if (user && user.dn) {
-          ad.authenticate(user.dn, password, function(err, auth) {
-            if (err) {
-              const fail_found = 'ERROR: ' + JSON.stringify(err);
+          ad.authenticate(user.dn, password, function(err2, auth) {
+            if (err2) {
+              const fail_found = `ERROR: ${JSON.stringify(err2)}`;
               reject(fail_found);
             }
             if (auth) {
