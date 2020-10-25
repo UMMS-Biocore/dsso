@@ -46,6 +46,7 @@ exports.useLdapStrategy = async (usernameoremail, password) => {
             }
           });
         } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
           reject(false);
         }
       });
@@ -88,7 +89,7 @@ passport.use(
       const passCheck = await user.correctPassword(password, user.password);
       if (passCheck) return done(null, user);
       // if passCheck is not verified, then check with ldap
-      ldapAuth = await useLdapStrategy(username, password);
+      ldapAuth = await exports.useLdapStrategy(username, password);
       if (ldapAuth) return done(null, user);
       return done(null, false);
     } catch {
