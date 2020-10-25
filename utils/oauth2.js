@@ -10,6 +10,7 @@ const oauth2orize = require('oauth2orize');
 const passport = require('passport');
 const utils = require('./utils');
 const validate = require('./validate');
+const auth = require('./auth');
 const Client = require('./../models/clientModel');
 const authCodes = require('./../controllers/authCodeController.js');
 const accessTokens = require('./../controllers/accessTokenController.js');
@@ -114,10 +115,22 @@ server.exchange(
   oauth2orize.exchange.password(async (client, username, password, scope, done) => {
     console.log('oauth2orize.exchange.password');
     try {
-      const user = await User.findOne({ username }).select('+password');
-      if (!user || !(await user.correctPassword(password, user.password))) {
-        return done(null, false);
+      let ldapAuth = false;
+      let data = {};
+      if (username.match(/@/)) {
+        data.email = username;
+      } else {
+        data.username = username;
       }
+      const user = await User.findOne(data).select('+password');
+      if (!user) return done(null, false);
+      const passCheck = await user.correctPassword(password, user.password);
+      if (!passCheck) {
+        // if passCheck is not verified, then check with ldap
+        ldapAuth = await auth.useLdapStrategy(username, password);
+        if (!ldapAuth) return done(null, false);
+      }
+
       console.log('client', client);
       const tokens = await validate.generateTokens({
         scope,
