@@ -20,7 +20,7 @@ export const loadLoginDiv = divID => {
   loginDivs.loginDiv = `<div class="body bg-white" style=" border-radius:5px; padding:30px;">
   <form action="/login" method="post">
    <div style="margin:auto; height:80px; padding-top:20px;">
-       <h2 class="text-center">Log In</h2>
+       <h2 class="text-center">SSO Log In</h2>
    </div>
    <div style="margin:auto; width:50%;  height:100px; padding-top:20px; padding-left:30px;">
     <a href="/auth/google" class="btn btn-info"><i class="fa fa-pencil" aria-hidden="true"></i> Sign In with Google</a>
@@ -35,9 +35,11 @@ export const loadLoginDiv = divID => {
        <button type="submit" name="login" class="btn btn-info" style="float:right;">Login</button>
    </div>
   </form>
-  <div class="text-center" style="margin-top:30%;">Don't have an account <button type="submit" name="signup" id="signupBtn" class="btn btn-light" style="margin-left:10px;">Sign Up</button>
-  </div>
+  
 </div>`;
+
+  /* <div class="text-center" style="margin-top:30%;">Don't have an account <button type="submit" name="signup" id="signupBtn" class="btn btn-light" style="margin-left:10px;">Sign Up</button>
+  </div> */
 
   loginDivs.registerDiv = `<div class="body bg-white" style=" border-radius:5px; padding:30px;"
   <form>
