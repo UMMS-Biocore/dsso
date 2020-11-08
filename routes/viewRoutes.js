@@ -17,7 +17,6 @@ router.get('/auth/google', authController.googleLogin);
 router.get('/auth/google/callback', authController.googleLoginCallback);
 
 router.get('/dialog/authorize', oauth2.authorization);
-router.get('/dialog/check', oauth2.check_authorization);
 // router.post('/dialog/authorize/decision', oauth2.decision);
 
 module.exports = router;

@@ -216,12 +216,12 @@ server.exchange(
 const checkLoggedIn = () => {
   return function(req, res, next) {
     console.log('checkLoggedIn');
-    console.log(req.session);
     const redirectOriginal = req.query.redirect_original;
     if (req.user) {
-      //user signed in
+      console.log(`* user signed in`);
       next();
     } else {
+      console.log(`* user not signed in. redirect to: ${redirectOriginal}`);
       res.redirect(redirectOriginal);
     }
   };
