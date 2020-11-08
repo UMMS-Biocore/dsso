@@ -1,4 +1,5 @@
-const path = require('path'); //output tanimlarken absolute path kullnilmasi gerekiyor
+/* eslint-disable node/no-unpublished-require */
+const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin'); //minimize js content
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
