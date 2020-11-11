@@ -34,11 +34,6 @@ app.locals.basedir = app.get('views'); // set basedir for pug
 // Implement CORS
 app.use(cors());
 // Access-Control-Allow-Origin *
-// app.use(
-//   cors({
-//     origin: '*'
-//   })
-// );
 
 app.options('*', cors());
 
