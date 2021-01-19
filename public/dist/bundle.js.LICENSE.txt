@@ -1,11 +1,4 @@
 /*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-/*!
  * Sizzle CSS Selector Engine v2.3.5
  * https://sizzlejs.com/
  *
@@ -62,9 +55,17 @@
 
 /*! ../cancel/isCancel */
 
+/*! ../core/buildFullPath */
+
 /*! ../core/createError */
 
 /*! ../defaults */
+
+/*! ../helpers/buildURL */
+
+/*! ../helpers/combineURLs */
+
+/*! ../helpers/isAbsoluteURL */
 
 /*! ../modules/_core */
 
@@ -356,15 +357,9 @@
 
 /*! ./../core/settle */
 
-/*! ./../defaults */
-
 /*! ./../helpers/buildURL */
 
-/*! ./../helpers/combineURLs */
-
 /*! ./../helpers/cookies */
-
-/*! ./../helpers/isAbsoluteURL */
 
 /*! ./../helpers/isURLSameOrigin */
 
@@ -628,6 +623,8 @@
 
 /*! ./core/Axios */
 
+/*! ./core/mergeConfig */
+
 /*! ./createError */
 
 /*! ./defaults */
@@ -646,6 +643,8 @@
 
 /*! ./helpers/bind */
 
+/*! ./helpers/isAxiosError */
+
 /*! ./helpers/normalizeHeaderName */
 
 /*! ./helpers/spread */
@@ -653,6 +652,8 @@
 /*! ./lib/axios */
 
 /*! ./login */
+
+/*! ./mergeConfig */
 
 /*! ./noConflict */
 
@@ -692,15 +693,13 @@
 
 /*! CommonJS bailout: module.exports is used directly at 1:11-25 */
 
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
 
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 27:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 27:2-16 */
-
-/*! CommonJS bailout: module.exports is used directly at 282:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 2:0-14 */
 
@@ -711,6 +710,8 @@
 /*! CommonJS bailout: module.exports is used directly at 31:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 325:2-16 */
+
+/*! CommonJS bailout: module.exports is used directly at 328:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 34:0-14 */
 
@@ -732,6 +733,8 @@
 
 /*! CommonJS bailout: module.exports is used directly at 52:0-14 */
 
+/*! CommonJS bailout: module.exports is used directly at 53:0-14 */
+
 /*! CommonJS bailout: module.exports is used directly at 57:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 58:0-14 */
@@ -748,15 +751,15 @@
 
 /*! CommonJS bailout: module.exports is used directly at 710:31-45 */
 
-/*! CommonJS bailout: module.exports is used directly at 79:0-14 */
-
 /*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 81:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 8:0-14 */
 
-/*! CommonJS bailout: module.exports is used directly at 96:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 95:0-14 */
+
+/*! CommonJS bailout: module.exports is used directly at 98:0-14 */
 
 /*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 
@@ -817,8 +820,6 @@
 /*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/@babel/polyfill/node_modules/core-js/modules/_core.js */
 
 /*! exports [not provided] [no usage info] */
-
-/*! is-buffer */
 
 /*! jquery */
 
@@ -927,6 +928,10 @@
   \****************************************************/
 
 /*!****************************************************!*\
+  !*** ./node_modules/axios/lib/core/mergeConfig.js ***!
+  \****************************************************/
+
+/*!****************************************************!*\
   !*** ./node_modules/axios/lib/helpers/buildURL.js ***!
   \****************************************************/
 
@@ -936,6 +941,10 @@
 
 /*!******************************************************!*\
   !*** ./node_modules/axios/lib/cancel/CancelToken.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ./node_modules/axios/lib/core/buildFullPath.js ***!
   \******************************************************/
 
 /*!******************************************************!*\
@@ -955,6 +964,10 @@
   \********************************************************/
 
 /*!********************************************************!*\
+  !*** ./node_modules/axios/lib/helpers/isAxiosError.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
   !*** ./node_modules/axios/lib/helpers/parseHeaders.js ***!
   \********************************************************/
 
@@ -969,10 +982,6 @@
 /*!***********************************************************!*\
   !*** ./node_modules/axios/lib/helpers/isURLSameOrigin.js ***!
   \***********************************************************/
-
-/*!************************************************************!*\
-  !*** ./node_modules/axios/node_modules/is-buffer/index.js ***!
-  \************************************************************/
 
 /*!***************************************************************!*\
   !*** ./node_modules/axios/lib/helpers/normalizeHeaderName.js ***!
