@@ -8,6 +8,8 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
+const MongoStore = require('connect-mongo')(expressSession);
+const mongoose = require('mongoose');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
@@ -61,9 +63,22 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 
-console.log('Using MemoryStore for the data store');
-console.log('Using MemoryStore for the Session');
-const MemoryStore = expressSession.MemoryStore;
+// console.log('Using MemoryStore for the data store');
+// console.log('Using MemoryStore for the Session');
+// const MemoryStore = expressSession.MemoryStore;
+
+// store session in mongodb
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('DB connection successful for session!'));
+
+mongoose.Promise = global.Promise;
 
 // Session Configuration
 app.use(
@@ -71,8 +86,8 @@ app.use(
     saveUninitialized: true,
     resave: true,
     secret: process.env.SESSION_SECRET,
-    store: new MemoryStore(),
-    key: 'authorization.sid',
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    key: 'dsso_authorization.sid',
     cookie: { maxAge: 3600000 * 24 * 7 * 52 } // a year in ms
   })
 );

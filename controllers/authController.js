@@ -22,7 +22,7 @@ const signToken = id => {
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
-  res.cookie('jwt', token, {
+  res.cookie('jwt-dsso', token, {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
@@ -82,6 +82,7 @@ exports.googleLoginCallback = [
     if (req.session.returnTo) {
       // eslint-disable-next-line node/no-deprecated-api
       const queryData = url.parse(req.session.returnTo, true).query;
+      console.log(queryData);
       req.query = {
         redirect_uri: queryData.redirect_uri,
         response_type: queryData.response_type,
@@ -118,8 +119,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
+  } else if (req.cookies['jwt-dsso']) {
+    token = req.cookies['jwt-dsso'];
   }
 
   if (!token) {
@@ -148,10 +149,10 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 // Only for rendered pages, no errors!
 exports.isLoggedIn = async (req, res, next) => {
-  if (req.session.isAuthorized && req.cookies.jwt) {
+  if (req.session.isAuthorized && req.cookies['jwt-dsso']) {
     try {
       // 1) verify token
-      const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+      const decoded = await promisify(jwt.verify)(req.cookies['jwt-dsso'], process.env.JWT_SECRET);
       // 2) Check if user still exists
       const currentUser = await User.findById(decoded.id);
       if (!currentUser) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const $ = require('jquery');
 
 // creates object of the form fields and change color of requiredFields
