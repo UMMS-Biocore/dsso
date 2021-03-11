@@ -1,0 +1,11 @@
+{
+  "script": "./server.js",
+  "watch": true,
+  "ignore_watch": ["node_modules", "tmp"],
+  "watch_options": {
+    "followSymlinks": false
+  },
+  "name": "dsso",
+  "log": "./../dsso_server.log",
+  "cwd": "./"
+}

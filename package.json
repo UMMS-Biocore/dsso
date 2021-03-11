@@ -10,7 +10,8 @@
     "debug": "ndb server.js",
     "build": "webpack --config webpack.config.js",
     "watch": "webpack  --config webpack.config.js  ",
-    "dev": "concurrently \"npm run start:dev\" \"npm run watch\""
+    "dev": "concurrently \"npm run start:dev\" \"npm run watch\"",
+    "pm2": "pm2 start pm2-process.json"
   },
   "browserslist": "> 1%, last 2 versions",
   "author": "Onur Yukselen",
