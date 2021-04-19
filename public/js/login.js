@@ -1,6 +1,5 @@
 /* eslint-disable */
 import axios from 'axios';
-const $ = require('jquery');
 
 export const logout = async () => {
   try {
@@ -17,19 +16,37 @@ export const logout = async () => {
 
 export const loadLoginDiv = divID => {
   let loginDivs = {};
+  const message = $('#login-env').attr('message');
+  const loginType = $('#login-env').attr('logintype');
+  let title = '';
+  let action = '';
+  let googleHref = '';
+  if (loginType == 'sso') {
+    title = 'SSO Log In';
+    action = '/login';
+    googleHref = '/auth/google';
+  } else if (loginType == 'local') {
+    title = 'Log In';
+    action = '/signin';
+    googleHref = '/auth/googlesignin';
+  }
+
   loginDivs.loginDiv = `<div class="body bg-white" style=" border-radius:5px; padding:30px;">
-  <form action="/login" method="post">
+  <form action="${action}" method="post">
    <div style="margin:auto; height:80px; padding-top:20px;">
-       <h2 class="text-center">SSO Log In</h2>
+       <h2 class="text-center">${title}</h2>
    </div>
    <div style="margin:auto; width:50%;  height:100px; padding-top:20px; padding-left:30px;">
-    <a href="/auth/google" class="btn btn-info"><i class="fa fa-pencil" aria-hidden="true"></i> Sign In with Google</a>
+    <a href="${googleHref}" class="btn btn-info text-nowrap"><i class="fa fa-pencil" aria-hidden="true"></i> Sign In with Google</a>
    </div>                    
    <div class="form-group" style="margin-top:20px;">
        <input name="username" class="form-control" placeholder="E-mail/Username" required>
    </div>
    <div class="form-group">
        <input type="password" name="password" class="form-control" placeholder="Password" minlength='6' required>
+   </div>
+   <div>
+      <p style="color:red;">${message}</p>
    </div>
    <div class="footer">
        <button type="submit" name="login" class="btn btn-info" style="float:right;">Login</button>

@@ -85,15 +85,15 @@ passport.use(
         data.username = username;
       }
       const user = await User.findOne(data).select('+password');
-      if (!user) return done(null, false);
+      if (!user) return done(null, false, { message: 'User not found.' });
       const passCheck = await user.correctPassword(password, user.password);
       if (passCheck) return done(null, user);
       // if passCheck is not verified, then check with ldap
       ldapAuth = await exports.useLdapStrategy(username, password);
       if (ldapAuth) return done(null, user);
-      return done(null, false);
+      return done(null, false, { message: 'Incorrect E-mail/Password.' });
     } catch {
-      done(null, false);
+      done(null, false, { message: 'Incorrect E-mail/Password.' });
     }
   })
 );

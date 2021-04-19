@@ -40,6 +40,14 @@ const createSendToken = (user, statusCode, req, res) => {
   });
 };
 
+const sendTokenCookie = (token, req, res) => {
+  res.cookie('jwt-dsso', token, {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: `${req.body.firstname} ${req.body.lastname}`,
@@ -65,12 +73,36 @@ exports.signup = catchAsync(async (req, res, next) => {
 /**
  * Authenticate normal login page using strategy of authenticate
  */
-exports.login = [
-  passport.authenticate('local', {
-    successReturnToOrRedirect: '/',
-    failureRedirect: '/login'
-  })
-];
+// exports.login = [
+//   passport.authenticate('local', {
+//     successReturnToOrRedirect: '/',
+//     failureRedirect: '/login'
+//   })
+// ];
+
+exports.login = (req, res, next) => {
+  passport.authenticate('local', function(err, user, info) {
+    console.log(info);
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      const message = info && info.message ? info.message : '';
+      return res.render('login', { title: 'Log into your account', message: message });
+    }
+    req.logIn(user, function(err2) {
+      if (err2) {
+        return next(err2);
+      }
+      if (req.session.returnTo) {
+        return res.redirect(req.session.returnTo);
+      }
+      const token = signToken(user._id);
+      sendTokenCookie(token, req, res);
+      return res.redirect('/');
+    });
+  })(req, res, next);
+};
 
 exports.googleLogin = [passport.authenticate('google', { scope: ['profile', 'email'] })];
 
@@ -91,11 +123,21 @@ exports.googleLoginCallback = [
       };
       next();
     } else {
+      if (req.user && req.user._id) {
+        const token = signToken(req.user._id);
+        sendTokenCookie(token, req, res);
+      }
       res.redirect('/');
     }
   },
   oauth2.check_authorization
 ];
+
+// remove returnTo for local login
+exports.removeReturnTo = catchAsync(async (req, res, next) => {
+  req.session.returnTo = '';
+  next();
+});
 
 /**
  * Logout of the system and redirect to root
@@ -113,6 +155,13 @@ exports.logout = (req, res) => {
   req.logout();
   res.redirect(redirect);
 };
+
+// isLoggedIn or isLoggedInView should be executed before this middleware
+exports.requireLogin = catchAsync(async (req, res, next) => {
+  if (!res.locals.user)
+    return next(new AppError('You are not logged in! Please log in to get access.', 401));
+  next();
+});
 
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of it's there
@@ -149,7 +198,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 // Only for rendered pages, no errors!
 exports.isLoggedIn = async (req, res, next) => {
-  if (req.session.isAuthorized && req.cookies['jwt-dsso']) {
+  if (req.cookies['jwt-dsso']) {
     try {
       // 1) verify token
       const decoded = await promisify(jwt.verify)(req.cookies['jwt-dsso'], process.env.JWT_SECRET);
