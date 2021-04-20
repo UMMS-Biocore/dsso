@@ -82,13 +82,17 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = (req, res, next) => {
   passport.authenticate('local', function(err, user, info) {
-    console.log(info);
     if (err) {
       return next(err);
     }
     if (!user) {
       const message = info && info.message ? info.message : '';
-      return res.render('login', { title: 'Log into your account', message: message });
+      const logintype = req.session.returnTo ? 'sso' : 'local';
+      return res.render('login', {
+        title: 'Log into your account',
+        message: message,
+        logintype: logintype
+      });
     }
     req.logIn(user, function(err2) {
       if (err2) {
@@ -146,12 +150,15 @@ exports.removeReturnTo = catchAsync(async (req, res, next) => {
  * @returns {undefined}
  */
 exports.logout = (req, res) => {
-  let redirect = '';
+  res.cookie('jwt-dsso', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  let redirect = '/';
   if (req.query && req.query.redirect_uri) {
     redirect = req.query.redirect_uri;
-  } else {
-    redirect = '/';
   }
+  console.log('redirect', redirect);
   req.logout();
   res.redirect(redirect);
 };
@@ -198,7 +205,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 // Only for rendered pages, no errors!
 exports.isLoggedIn = async (req, res, next) => {
-  if (req.cookies['jwt-dsso']) {
+  if (req.cookies['jwt-dsso'] && req.cookies['jwt-dsso'] != 'loggedout') {
     try {
       // 1) verify token
       const decoded = await promisify(jwt.verify)(req.cookies['jwt-dsso'], process.env.JWT_SECRET);

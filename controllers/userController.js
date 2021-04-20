@@ -91,8 +91,21 @@ exports.getUser = factory.getOne(User);
 exports.getAllUsers = factory.getAll(User);
 // Do NOT update passwords with this!
 exports.createUser = factory.createOne(User);
-exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id).select('+password');
+  if (req.body.password) user.password = req.body.password;
+  if (req.body.passwordConfirm) user.passwordConfirm = req.body.passwordConfirm;
+  const doc = await user.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: doc
+    }
+  });
+});
 
 // manual approach
 exports.find = async id => {

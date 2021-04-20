@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
 const beautifyUnique = require('mongoose-beautiful-unique-validation');
 
 const userSchema = new mongoose.Schema({
@@ -127,12 +126,32 @@ const userSchema = new mongoose.Schema({
 // proper warning message when field is not entered as unique
 userSchema.plugin(beautifyUnique);
 
+const hashEncrypt = (type, password) => {
+  let hash = crypto.createHash(type);
+  hash.update(password);
+  return hash.digest('hex');
+};
+
+const createHash = password => {
+  const salt = process.env.SALT ? process.env.SALT : '';
+  const pepper = process.env.PEPPER ? process.env.PEPPER : '';
+  const hash1 = hashEncrypt('md5', `${password}${salt}`);
+  const hash2 = hashEncrypt('sha256', `${password}${pepper}`);
+  return `${hash1}${hash2}`;
+};
+
+const compareHash = (candidatePassword, userPassword) => {
+  if (createHash(candidatePassword) === userPassword) return true;
+  return false;
+};
+
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
+  console.log('password isModified: ', this.isModified('password'));
+  console.log('password isNew: ', this.isNew);
   if (!this.isModified('password')) return next();
 
-  // Hash the password with cost of 12
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = createHash(this.password);
 
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
@@ -158,7 +177,7 @@ userSchema.pre(/^findOneAnd/, async function(next) {
 });
 
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-  return await bcrypt.compare(candidatePassword, userPassword);
+  return compareHash(candidatePassword, userPassword);
 };
 
 userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {

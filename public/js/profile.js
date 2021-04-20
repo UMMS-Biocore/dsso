@@ -228,6 +228,77 @@ const refreshAdminTable = async () => {
   }
 };
 
+const refreshUserImportTable = async secFilePath => {
+  const TableID = 'table-user-import';
+  let data = [];
+  if (secFilePath) {
+    try {
+      const res = await axios({
+        method: 'POST',
+        url: '/api/v1/misc/getDnextUsers',
+        data: { secFilePath }
+      });
+      if (res.data.status == 'success') {
+        data = res.data.data.data;
+      } else {
+        showInfoModal('Error occured.');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        showInfoModal(`Error occured.(${JSON.stringify(err.response.data.message)})`);
+      } else {
+        showInfoModal(`Error occured.(${JSON.stringify(err)})`);
+      }
+    }
+  }
+
+  if ($.fn.DataTable.isDataTable(`#${TableID}`)) {
+    $(`#${TableID}`)
+      .DataTable()
+      .destroy();
+  }
+
+  if (!$.fn.DataTable.isDataTable(`#${TableID}`)) {
+    let columns = [];
+    columns.push({ data: 'id' });
+    columns.push({ data: 'id' });
+    columns.push({ data: 'name' });
+    columns.push({ data: 'username' });
+    columns.push({ data: 'email' });
+    columns.push({ data: 'institute' });
+    columns.push({ data: 'role' });
+    columns.push({ data: 'loginType' });
+    columns.push({ data: 'exist' });
+
+    var dataTableObj = {
+      columns: columns,
+      columnDefs: [
+        { defaultContent: '', targets: '_all' },
+        {
+          targets: 0,
+          checkboxes: {
+            selectRow: true
+          }
+        }
+      ],
+      select: {
+        style: 'multiple'
+      }
+    };
+    dataTableObj.dom = '<"pull-left"f>lrt<"pull-left"i><"bottom"p><"clear">';
+    dataTableObj.destroy = true;
+    dataTableObj.pageLength = 10;
+    dataTableObj.data = data;
+    dataTableObj.hover = true;
+    // speed up the table loading
+    dataTableObj.deferRender = true;
+    dataTableObj.scroller = true;
+    dataTableObj.scrollCollapse = true;
+    // dataTableObj.sScrollX = true; // dropdown remains under the datatable div
+    $s.TableID = $(`#${TableID}`).DataTable(dataTableObj);
+  }
+};
+
 const getTableHeaders = labels => {
   let ret = '';
   for (var i = 0; i < labels.length; i++) {
@@ -294,8 +365,35 @@ const getAdminTab = id => {
     </thead>
     </table>
   </div>`;
+
+  const userImportTableID = `table-user-import`;
+  const userImportHeaders = getTableHeaders([
+    '',
+    'ID',
+    'Name',
+    'Username',
+    'E-mail',
+    'Institute',
+    'Role',
+    'Login Type',
+    'Exist'
+  ]);
+  const userImportTable = `
+  <div class="table-responsive" style="overflow-x:auto; width:100%; ">
+    <table id="${userImportTableID}" class="table table-striped" style='white-space: nowrap; width:100%;' cellspacing="0" >
+        <thead>
+            <tr>
+            ${userImportHeaders}
+            </tr>
+        <tbody>
+        </tbody>
+    </thead>
+    </table>
+  </div>`;
+
   const buttonAddUser = `<button class="btn btn-primary admin-add-user" type="button">Add an User</button>`;
-  const buttonImportUser = `<button class="btn btn-primary admin-load-user" type="button">Load Users</button>`;
+  const buttonLoadUser = `<button class="btn btn-primary admin-load-user" type="button">Load Users</button>`;
+  const buttonImportUser = `<button class="btn btn-primary admin-import-user" type="button">Import Users</button>`;
   const groups = `
   <div style="margin-top:10px;" class="row">
     <div class="col-sm-12">
@@ -314,8 +412,12 @@ const getAdminTab = id => {
         <div class="card-header"> 
           <span style="font-size:large; font-weight:600;"><i class="cil-people"> </i> Import User from DolphinNext</span>
           <div style="float:right;" class="card-header-actions">
+            ${buttonLoadUser}
             ${buttonImportUser}
           </div>
+        </div>
+        <div class="card-body">
+          ${userImportTable}
         </div>
       </div>
     </div>
@@ -323,9 +425,10 @@ const getAdminTab = id => {
   return groups;
 };
 
-export const loadProfileTabContent = userRole => {
+export const loadProfileTabContent = async userRole => {
   // refreshGroupTable();
   if (userRole == 'admin') refreshAdminTable();
+  if (userRole == 'admin') await refreshUserImportTable('');
 };
 
 const getGroupForm = () => {
@@ -337,7 +440,7 @@ const getGroupForm = () => {
 };
 
 const getInputElement = (name, attr) => {
-  return `<input class="form-control" type="text" name="${name}" ${attr} value=""></input>`;
+  return `<input class="form-control" type="text" name="${name}" ${attr}></input>`;
 };
 
 const getDropdown = (name, data) => {
@@ -352,8 +455,12 @@ const getDropdown = (name, data) => {
 };
 
 const getDnextImportForm = () => {
-  const ret = `<p>Please enter the .sec (config file) path of DolphinNext. </p>`;
-  ret += getFormRow(getInputElement('secFilePath', 'required'), 'File Path (.sec)', {});
+  let ret = `<p>Please enter the path of DolphinNext config file. </p>`;
+  ret += getFormRow(
+    getInputElement('secFilePath', 'required value="/var/www/html/dolphinnext/config/.sec"'),
+    'File Path (.sec)',
+    {}
+  );
   return ret;
 };
 
@@ -364,8 +471,8 @@ const getAdminUserForm = type => {
   ret += getFormRow(getInputElement('email', 'required'), 'E-mail', {});
   ret += getFormRow(getInputElement('institute', ''), 'Institute', {});
   ret += getFormRow(getInputElement('lab', ''), 'Lab', {});
-  if (type == 'insert') {
-    ret += getFormRow(getInputElement('password', ''), 'Password', {});
+  ret += getFormRow(getInputElement('password', ''), 'Password', {});
+  if (type === 'insert') {
     ret += getFormRow(getInputElement('passwordConfirm', ''), 'Password Confirm', {});
   }
   ret += getFormRow(getDropdown('role', ['user', 'project-admin', 'admin']), 'Role', {});
@@ -376,11 +483,56 @@ const getAdminUserForm = type => {
 
 const bindEventHandlers = () => {
   // -------- USERS -----------
+  $(document).on('click', `button.admin-import-user`, async function(e) {
+    const table = $(`#table-user-import`).DataTable();
+    const tableData = table.rows().data();
+    const rows_selected = table.column(0).checkboxes.selected();
+    const selectedData = tableData.filter(f => rows_selected.indexOf(f.id) >= 0);
+    const secFilePath = $(`button.admin-load-user`).data('secFilePath');
+    console.log('secFilePath', secFilePath);
+    if (!selectedData.length) {
+      showInfoModal('Please select users to import.');
+    } else {
+      let userlist = [];
+      for (let i = 0; i < selectedData.length; i++) {
+        userlist.push(selectedData[i].id);
+      }
+      try {
+        const res = await axios({
+          method: 'POST',
+          url: '/api/v1/misc/importDnextUsers',
+          data: { userlist, secFilePath }
+        });
+        if (res.data.status == 'success') {
+          console.log(res.data.data.data);
+          let errText = '';
+          for (let i = 0; i < res.data.data.data.length; i++) {
+            if (res.data.data.data[i] != 1) {
+              errText += JSON.stringify(res.data.data.data[i]);
+            }
+          }
+          if (errText) {
+            showInfoModal(errText);
+          }
+          await refreshUserImportTable(secFilePath);
+          await refreshAdminTable();
+        } else {
+          showInfoModal('Error occured.');
+        }
+      } catch (err) {
+        if (err.response && err.response.data && err.response.data.message) {
+          showInfoModal(`Error occured.(${JSON.stringify(err.response.data.message)})`);
+        } else {
+          showInfoModal(`Error occured.(${JSON.stringify(err)})`);
+        }
+      }
+    }
+  });
   $(document).on('click', `button.admin-load-user`, async function(e) {
     $('#crudModalError').empty();
     const form = getDnextImportForm();
-    $('#crudModalTitle').text(`Import Users`);
-    $('#crudModalYes').text('Save');
+    $('#crudModalTitle').text(`Load Users`);
+    $('#crudModalYes').text('Load');
     $('#crudModalBody').empty();
     $('#crudModalBody').append(form);
     $('#crudModal').off();
@@ -391,29 +543,16 @@ const bindEventHandlers = () => {
       const requiredFields = $.map(requiredValues, function(el) {
         return $(el).attr('name');
       });
+
       let [formObj, stop] = createFormObj(formValues, requiredFields, true, true);
       if (stop === false) {
-        formObj.active = true;
         try {
-          const res = await axios({
-            method: 'POST',
-            url: '/api/v1/misc',
-            data: formObj
-          });
-          if (res.data.status == 'success') {
-            await refreshAdminTable();
-            $('#crudModal').modal('hide');
-          } else {
-            showInfoModal('Error occured.');
-          }
+          const secFilePath = formObj.secFilePath;
+          $(`button.admin-load-user`).data('secFilePath', secFilePath);
+          await refreshUserImportTable(secFilePath);
+          $('#crudModal').modal('hide');
         } catch (err) {
-          if (err.response && err.response.data && err.response.data.error) {
-            showFormError(formValues, err.response.data.error.errors, true);
-          } else if (err.response && err.response.data && err.response.data.message) {
-            showInfoModal(`Error occured.(${JSON.stringify(err.response.data.message)})`);
-          } else {
-            showInfoModal(`Error occured.(${JSON.stringify(err)})`);
-          }
+          console.log(err);
         }
       }
     });
@@ -525,6 +664,11 @@ const bindEventHandlers = () => {
       let [formObj, stop] = createFormObj(formValues, requiredFields, true, true);
       console.log(formObj);
       if (stop === false) {
+        console.log(formObj);
+        // only update password when it is entered
+        if (!formObj.password) {
+          delete formObj.password;
+        }
         try {
           const res = await axios({
             method: 'PATCH',

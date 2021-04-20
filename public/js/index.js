@@ -29,6 +29,7 @@ const loginForm = document.querySelector('#loginOuterDiv');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const allProfileNav = document.querySelector('#allProfileNav');
+const logOutBtn = document.querySelector('.nav__el--logout');
 
 if (loginForm) {
   loadLoginDiv('loginDiv');
@@ -86,12 +87,12 @@ if (loginForm) {
 //   login(email_or_username, password);
 // });
 
-// if (logOutBtn) logOutBtn.addEventListener('click', logout);
+if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 (async () => {
   if (allProfileNav) {
     const profileNavbar = await getProfileNavbar(userRole);
     $('#allProfileNav').append(profileNavbar);
-    loadProfileTabContent(userRole);
+    await loadProfileTabContent(userRole);
   }
 })();
