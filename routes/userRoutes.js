@@ -8,7 +8,16 @@ router.post('/signup', authController.signup);
 router.get('/logout', authController.logout);
 router.get('/info', userController.userinfo); //passport.authenticate('bearer')
 
-// Protect all routes after this middleware
-// router.use(authController.protect);
+router.use(authController.isLoggedIn);
+router.use(authController.requireLogin);
+router.use(authController.restrictTo('admin'));
+router
+  .route('/')
+  .get(userController.getAllUsers)
+  .post(userController.createUser);
+router
+  .route('/:id')
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;

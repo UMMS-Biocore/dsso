@@ -21,6 +21,7 @@ const userRouter = require('./routes/userRoutes');
 const clientRouter = require('./routes/clientRoutes');
 const tokenRouter = require('./routes/tokenRoutes');
 const viewRouter = require('./routes/viewRoutes');
+const miscRouter = require('./routes/miscRoutes');
 const accessTokens = require('./controllers/accessTokenController');
 
 // Start express app
@@ -141,6 +142,7 @@ app.use('/api/v1/oauth', oauthRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/clients', clientRouter);
 app.use('/api/v1/tokens', tokenRouter);
+app.use('/api/v1/misc', miscRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

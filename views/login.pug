@@ -4,6 +4,7 @@ block view
   .container
     .row.justify-content-center
       .col-md-6
+        div#login-env(style="display: none;" message=(message ? message : "") logintype=(logintype))
         .card.mx-4#loginOuterDiv(style='min-height:350px')
           //- .card-body.p-4
           //-   h1 Register

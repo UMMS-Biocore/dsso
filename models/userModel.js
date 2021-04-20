@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
 const beautifyUnique = require('mongoose-beautiful-unique-validation');
 
 const userSchema = new mongoose.Schema({
@@ -22,6 +21,12 @@ const userSchema = new mongoose.Schema({
     unique: 'The username ({VALUE}) already in use. Please use a different username.',
     lowercase: true
   },
+  institute: {
+    type: String
+  },
+  lab: {
+    type: String
+  },
   photo: {
     type: String,
     default: 'default.jpg'
@@ -41,20 +46,57 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 6,
+    validate: {
+      validator: function(el) {
+        let update;
+        if (this.getUpdate) update = this.getUpdate();
+        let loginType;
+        if (this.loginType) {
+          // for createNewField
+          loginType = this.loginType;
+        } else if (update && update['$set'] && update['$set'].loginType) {
+          loginType = update['$set'].loginType;
+        } else if (this.r && this.r.loginType) {
+          // for findByIdAndUpdate
+          loginType = this.r.loginType;
+        }
+        if (loginType == 'password') {
+          return el.length > 5;
+        }
+        return true;
+      },
+      message: 'Please provide a password longer than 5 characters'
+    },
     select: false
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'Please confirm your password'],
     validate: {
-      // This only works on CREATE and SAVE!!!
       validator: function(el) {
-        return el === this.password;
+        let update;
+        if (this.getUpdate) update = this.getUpdate();
+        let loginType;
+        let password;
+        if (this.loginType) {
+          // for createNewField
+          loginType = this.loginType;
+          password = this.password;
+        } else if (update && update['$set'] && update['$set'].loginType) {
+          loginType = update['$set'].loginType;
+          password = update['$set'].password;
+        } else if (this.r && this.r.loginType) {
+          // for findByIdAndUpdate
+          loginType = this.r.loginType;
+          password = this.r.password;
+        }
+        if (loginType == 'password') {
+          return el === password;
+        }
+        return true;
       },
       message: 'Passwords are not the same!'
-    }
+    },
+    select: false
   },
   emailConfirm: {
     type: String,
@@ -84,12 +126,32 @@ const userSchema = new mongoose.Schema({
 // proper warning message when field is not entered as unique
 userSchema.plugin(beautifyUnique);
 
+const hashEncrypt = (type, password) => {
+  let hash = crypto.createHash(type);
+  hash.update(password);
+  return hash.digest('hex');
+};
+
+const createHash = password => {
+  const salt = process.env.SALT ? process.env.SALT : '';
+  const pepper = process.env.PEPPER ? process.env.PEPPER : '';
+  const hash1 = hashEncrypt('md5', `${password}${salt}`);
+  const hash2 = hashEncrypt('sha256', `${password}${pepper}`);
+  return `${hash1}${hash2}`;
+};
+
+const compareHash = (candidatePassword, userPassword) => {
+  if (createHash(candidatePassword) === userPassword) return true;
+  return false;
+};
+
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
+  console.log('password isModified: ', this.isModified('password'));
+  console.log('password isNew: ', this.isNew);
   if (!this.isModified('password')) return next();
 
-  // Hash the password with cost of 12
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = createHash(this.password);
 
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
@@ -109,8 +171,13 @@ userSchema.pre(/^find/, function(next) {
   next();
 });
 
+userSchema.pre(/^findOneAnd/, async function(next) {
+  this.r = await this.findOne();
+  next();
+});
+
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-  return await bcrypt.compare(candidatePassword, userPassword);
+  return compareHash(candidatePassword, userPassword);
 };
 
 userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {

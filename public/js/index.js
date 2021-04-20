@@ -1,20 +1,35 @@
 /* eslint-disable */
 import '@babel/polyfill';
 import { loadLoginDiv, logout } from './login';
-import { createFormObj, showFormError } from './funcs';
-import axios from 'axios';
+import { createFormObj, showFormError } from './jsfuncs';
+import { getProfileNavbar, loadProfileTabContent } from './profile.js';
 
-const $ = require('jquery');
-// require('popper.js');
-// require('pace');
-// require('perfect-scrollbar');
-// require('@coreui/coreui');
-// require('chart.js');
+import axios from 'axios';
+import 'jquery';
+import '@coreui/coreui';
+require('datatables.net'); // Datatables Core
+require('datatables.net-bs4/js/dataTables.bootstrap4.js'); // Datatables Bootstrap 4
+require('datatables.net-bs4/css/dataTables.bootstrap4.css'); // Datatables Bootstrap 4
+require('datatables.net-colreorder');
+require('datatables.net-colreorder-bs4');
+require('jquery-datatables-checkboxes');
+require('selectize/dist/js/selectize.js');
+require('selectize/dist/css/selectize.bootstrap3.css');
+
+import './../vendors/@coreui/icons/css/free.min.css';
+import './../vendors/@coreui/icons/css/flag.min.css';
+import './../vendors/@coreui/icons/css/brand.min.css';
+
+// GLOBAL ENV CONFIG
+const envConf = document.querySelector('#session-env-config');
+const userRole = envConf && envConf.getAttribute('role');
 
 // DOM ELEMENTS
 const loginForm = document.querySelector('#loginOuterDiv');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const allProfileNav = document.querySelector('#allProfileNav');
+const logOutBtn = document.querySelector('.nav__el--logout');
 
 if (loginForm) {
   loadLoginDiv('loginDiv');
@@ -72,4 +87,12 @@ if (loginForm) {
 //   login(email_or_username, password);
 // });
 
-// if (logOutBtn) logOutBtn.addEventListener('click', logout);
+if (logOutBtn) logOutBtn.addEventListener('click', logout);
+
+(async () => {
+  if (allProfileNav) {
+    const profileNavbar = await getProfileNavbar(userRole);
+    $('#allProfileNav').append(profileNavbar);
+    await loadProfileTabContent(userRole);
+  }
+})();

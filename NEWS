@@ -1,3 +1,9 @@
+19.04.2021 Version 0.0.6
+SALT and PEPPER parameters added to config.env.
+Dolphinnnext user import feature added.
+Profile and home page added.
+User panel added for admin.
+
 20.01.2021 Version 0.0.5
 Session data saved to database.
 jwt cookie replaced with jwt-dsso.
