@@ -84,6 +84,28 @@ passport.use(
       } else {
         data.username = username;
       }
+      // insert first user as admin if no user is found in database
+      const allUsersArr = await User.find({}, '_id');
+      if (allUsersArr.length < 1) {
+        let newuser = {};
+        if (data.username) {
+          newuser.username = data.username;
+          newuser.email = 'admin@admin.com';
+        } else {
+          newuser.email = data.email;
+          newuser.username = 'admin';
+        }
+        newuser.active = true;
+        newuser.role = 'admin';
+        newuser.loginType = 'password';
+        newuser.name = 'admin';
+        newuser.institute = '';
+        newuser.lab = '';
+        newuser.password = password;
+        newuser.passwordConfirm = password;
+        await User.create(newuser);
+      }
+
       const user = await User.findOne(data).select('+password');
       if (!user) return done(null, false, { message: 'User not found.' });
       const passCheck = await user.correctPassword(password, user.password);

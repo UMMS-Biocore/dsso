@@ -1,3 +1,6 @@
+08.06.2021 Version 0.0.7
+insert first user as admin if no user is found in database.
+
 19.04.2021 Version 0.0.6
 SALT and PEPPER parameters added to config.env.
 DolphinNext user import feature added.
