@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
   },
   loginType: {
     type: String,
-    enum: ['password', 'google', 'ldap'],
+    enum: ['password', 'google', 'ldap', ''],
     default: 'password'
   },
   scope: {
