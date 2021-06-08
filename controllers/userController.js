@@ -34,6 +34,7 @@ exports.userinfo = [
       name: req.user.name,
       email: req.user.email,
       username: req.user.username,
+      role: req.user.role,
       scope: req.authInfo.scope
     });
   }
